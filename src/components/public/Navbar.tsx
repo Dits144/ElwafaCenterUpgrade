@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
+import { PublicPage } from '../../types';
 import { Menu, X, GraduationCap, ShieldCheck, ArrowRight, Phone, Mail } from 'lucide-react';
 
 interface NavbarProps {
@@ -7,23 +9,37 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenRegisterModal }) => {
-  const { setRole } = useApp();
+  const { role, setRole, currentPage, setCurrentPage } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const navLinks: { id: PublicPage; label: string }[] = [
+    { id: 'beranda', label: 'Beranda' },
+    { id: 'program', label: 'Program Kami' },
+    { id: 'tentang', label: 'Tentang Kami' },
+    { id: 'kegiatan', label: 'Galeri Kegiatan' },
+    { id: 'artikel', label: 'Berita & Artikel' },
+    { id: 'kontak', label: 'Kontak' },
+  ];
+
+  const handleNavClick = (pageId: PublicPage) => {
+    setCurrentPage(pageId);
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <header className="sticky top-0 z-40 bg-white shadow-sm transition-all border-b border-[#003B46]/10">
-      {/* Top Bar Asli elwafacenter.com */}
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-2xs transition-all border-b border-[#003B46]/10">
+      {/* Top Bar Informasi Resmi elwafacenter.com */}
       <div className="bg-[#003B46] text-white text-xs py-2 px-4 border-b border-[#00262D]">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1.5">
           <div className="flex items-center gap-4 text-[11px] sm:text-xs">
             <a
-              href="https://wa.me/6285188445164"
+              href="https://wa.me/6281221463946"
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1.5 text-white/90 hover:text-elwafa-gold transition-colors"
             >
               <Phone className="w-3.5 h-3.5 text-elwafa-gold" />
-              <span>+62 851-8844-5164</span>
+              <span>+62 812-2146-3946</span>
             </a>
             <span className="text-white/30">|</span>
             <a
@@ -35,61 +51,81 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenRegisterModal }) => {
             </a>
           </div>
 
-          <div className="text-[11px] text-white/80 hidden md:block">
-            Pusat Pembinaan & Konsultan Resmi Studi Universitas Al-Azhar Kairo Mesir
+          <div className="text-[11px] text-white/80 hidden md:flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Informasi studi dan program pembinaan Elwafa Center</span>
           </div>
         </div>
       </div>
 
-      {/* Main Navbar */}
+      {/* Main Glassmorphic Navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        {/* Brand Logo Asli */}
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        {/* Brand Logo Asli - Seamless Transparent Background */}
+        <div
+          className="flex items-center gap-3 cursor-pointer group"
+          onClick={() => handleNavClick('beranda')}
+        >
           <img
-            src="/assets/Logo-Website-2.1.png"
-            alt="Elwafa Center"
-            className="h-12 sm:h-14 w-auto object-contain"
+            src="/assets/logo-elwafa-horizontal-dark.png"
+            alt="Elwafa Internasional Center"
+            className="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-102"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = '/assets/logo-elwafa-vertical-transparent.png';
+            }}
           />
         </div>
 
-        {/* Menu Items Asli elwafacenter.com */}
-        <nav className="hidden lg:flex items-center gap-7 text-sm font-bold text-[#192A3D]">
-          <a href="#beranda" className="hover:text-elwafa-teal transition-colors py-2 border-b-2 border-transparent hover:border-elwafa-teal">Beranda</a>
-          <a href="#program" className="hover:text-elwafa-teal transition-colors py-2 border-b-2 border-transparent hover:border-elwafa-teal">Program Kami</a>
-          <a href="#tentang" className="hover:text-elwafa-teal transition-colors py-2 border-b-2 border-transparent hover:border-elwafa-teal">Tentang Kami</a>
-          <a href="#kegiatan" className="hover:text-elwafa-teal transition-colors py-2 border-b-2 border-transparent hover:border-elwafa-teal">Kegiatan</a>
-          <a href="#testimoni" className="hover:text-elwafa-teal transition-colors py-2 border-b-2 border-transparent hover:border-elwafa-teal">Testimoni</a>
-          <a href="#kontak" className="hover:text-elwafa-teal transition-colors py-2 border-b-2 border-transparent hover:border-elwafa-teal">Kontak</a>
+        {/* Desktop Menu Items with Framer Motion Active Pill (Inspired by Syahdi Cargo) */}
+        <nav className="hidden lg:flex items-center gap-1 p-1.5 bg-elwafa-surface/80 border border-elwafa-surface-border rounded-2xl text-xs font-bold text-elwafa-ocean shadow-2xs">
+          {navLinks.map((link) => {
+            const isActive = role === 'visitor' && currentPage === link.id;
+            return (
+              <button
+                key={link.id}
+                onClick={() => handleNavClick(link.id)}
+                className={`relative px-4 py-2 rounded-xl transition-all select-none ${
+                  isActive
+                    ? 'text-white'
+                    : 'text-elwafa-text-muted hover:text-elwafa-ocean hover:bg-white/50'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="active-nav-pill"
+                    className="absolute inset-0 bg-elwafa-ocean rounded-xl shadow-xs"
+                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">{link.label}</span>
+              </button>
+            );
+          })}
         </nav>
 
-        {/* Desktop Action Buttons */}
-        <div className="hidden lg:flex items-center gap-2.5">
+        {/* Action Buttons */}
+        <div className="hidden lg:flex items-center gap-2">
           <button
-            onClick={() => setRole('student')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#003B46] bg-[#EEF5F4] hover:bg-elwafa-teal/15 transition-all border border-[#DCE8E6]"
+            onClick={() => setCurrentPage('login')}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
+              currentPage === 'login'
+                ? 'bg-elwafa-ocean text-white border-elwafa-ocean shadow-xs'
+                : 'text-[#003B46] bg-[#EEF5F4] hover:bg-elwafa-teal/15 border-[#DCE8E6]'
+            }`}
           >
-            <GraduationCap className="w-4 h-4 text-elwafa-teal" />
-            <span>Portal Mahasiswa</span>
-          </button>
-
-          <button
-            onClick={() => setRole('admin')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#003B46] bg-[#FFF9E6] hover:bg-elwafa-gold/30 transition-all border border-elwafa-gold/40"
-          >
-            <ShieldCheck className="w-4 h-4 text-elwafa-ocean" />
-            <span>Portal Admin</span>
+            <GraduationCap className="w-3.5 h-3.5 text-elwafa-teal" />
+            <span>Portal Masuk Demo</span>
           </button>
 
           <button
             onClick={onOpenRegisterModal}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-elwafa-teal hover:bg-elwafa-teal-dark shadow-sm hover:shadow transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-elwafa-teal hover:bg-elwafa-teal-dark shadow-sm hover:shadow transition-all"
           >
-            <span>Daftar Sekarang</span>
+            <span>Daftar Seleksi</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Mobile menu button */}
+        {/* Mobile menu hamburger toggle */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="lg:hidden p-2 text-elwafa-text-main hover:bg-elwafa-surface-subtle rounded-xl"
@@ -99,51 +135,53 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenRegisterModal }) => {
         </button>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-elwafa-surface-border bg-white px-4 pt-3 pb-6 space-y-3">
-          <div className="grid grid-cols-2 gap-2 pb-3 border-b border-elwafa-surface-border">
+        <div className="lg:hidden border-t border-elwafa-surface-border bg-white px-4 pt-3 pb-6 space-y-3 shadow-lg">
+          <div className="pb-3 border-b border-elwafa-surface-border">
             <button
               onClick={() => {
-                setRole('student');
+                setCurrentPage('login');
                 setMobileMenuOpen(false);
               }}
-              className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-bold text-elwafa-ocean bg-elwafa-surface-subtle"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold text-white bg-elwafa-ocean shadow-xs"
             >
-              <GraduationCap className="w-4 h-4 text-elwafa-teal" />
-              <span>Portal Mahasiswa</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setRole('admin');
-                setMobileMenuOpen(false);
-              }}
-              className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-bold text-elwafa-ocean-dark bg-elwafa-gold/20"
-            >
-              <ShieldCheck className="w-4 h-4 text-elwafa-ocean" />
-              <span>Portal Admin</span>
+              <GraduationCap className="w-4 h-4 text-elwafa-gold" />
+              <span>Masuk Portal Demo (Mahasiswa &amp; Admin)</span>
             </button>
           </div>
 
-          <div className="flex flex-col space-y-2 text-sm font-semibold text-elwafa-text-main">
-            <a href="#beranda" onClick={() => setMobileMenuOpen(false)} className="py-1.5 hover:text-elwafa-teal">Beranda</a>
-            <a href="#program" onClick={() => setMobileMenuOpen(false)} className="py-1.5 hover:text-elwafa-teal">Program Kami</a>
-            <a href="#tentang" onClick={() => setMobileMenuOpen(false)} className="py-1.5 hover:text-elwafa-teal">Tentang Kami</a>
-            <a href="#kegiatan" onClick={() => setMobileMenuOpen(false)} className="py-1.5 hover:text-elwafa-teal">Kegiatan</a>
-            <a href="#testimoni" onClick={() => setMobileMenuOpen(false)} className="py-1.5 hover:text-elwafa-teal">Testimoni</a>
-            <a href="#kontak" onClick={() => setMobileMenuOpen(false)} className="py-1.5 hover:text-elwafa-teal">Kontak</a>
+          <div className="flex flex-col gap-1 text-sm font-bold text-elwafa-ocean">
+            {navLinks.map((link) => {
+              const isActive = role === 'visitor' && currentPage === link.id;
+              return (
+                <button
+                  key={link.id}
+                  onClick={() => handleNavClick(link.id)}
+                  className={`text-left py-2 px-3 rounded-xl transition-all ${
+                    isActive
+                      ? 'bg-elwafa-ocean text-white font-extrabold'
+                      : 'hover:bg-elwafa-surface text-elwafa-text-muted hover:text-elwafa-ocean'
+                  }`}
+                >
+                  {link.label}
+                </button>
+              );
+            })}
           </div>
 
-          <button
-            onClick={() => {
-              setMobileMenuOpen(false);
-              onOpenRegisterModal();
-            }}
-            className="w-full mt-2 py-3 rounded-xl text-center font-bold text-sm text-white bg-elwafa-teal shadow"
-          >
-            Daftar Seleksi Calon Mahasiswa
-          </button>
+          <div className="pt-3 border-t border-elwafa-surface-border">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                onOpenRegisterModal();
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-elwafa-teal text-white font-bold text-xs shadow-sm"
+            >
+              <span>Daftar Seleksi Santri Baru</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
     </header>

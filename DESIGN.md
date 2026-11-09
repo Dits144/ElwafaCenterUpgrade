@@ -40,3 +40,10 @@ Desain dirancang untuk memancarkan wibawa akademik, keterbukaan, kepercayaan san
 3. **No Decorative Emoji Abuse:** Menghindari penggunaan emoji berlebih di tombol institusi resmi. Diganti dengan icon SVG presisi dari `lucide-react`.
 4. **Predictable Interaction:** Setiap tombol memiliki fungsi nyata, modal konfirmasi, atau navigasi langsung (No Dead Buttons).
 5. **Touch & Motor Friendly:** Ukuran tombol minimal 44px tinggi, touch targets nyaman di mobile 360px-390px.
+
+---
+
+## 5. Experience Upgrade (incremental, 2026)
+Palet baru diminta: deep emerald `#123C35`, forest `#1E5447`, warm ivory `#F8F6F0`, sand `#EAE3D5`, muted gold `#C6A76A`, charcoal `#202724`. Palet lama di atas masih digunakan sebagian komponen; rollout bertahap agar fungsi tidak berubah mendadak. Hero dan intro memakai palet baru. Token CSS di `src/index.css` menjadi referensi implementasi tahap ini.
+
+Heading editorial memakai Cormorant Garamond, isi Plus Jakarta Sans, teks Arab Amiri dengan `lang="ar" dir="rtl"`. Intro sekali per sesi, tak memblokir pointer, dan dihilangkan saat reduced-motion. Hindari mengklaim testimoni, afiliasi, atau data dashboard sebagai resmi tanpa verifikasi organisasi.

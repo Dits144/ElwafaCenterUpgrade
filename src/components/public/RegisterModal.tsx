@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+// Data di formulir ini hanya untuk simulasi lokal, bukan pendaftaran resmi.
 import { useApp } from '../../context/AppContext';
 import { Program } from '../../types';
 import { X, Sparkles, User, Mail, Phone, BookOpen, ArrowRight } from 'lucide-react';
@@ -17,6 +19,10 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, p
   const [whatsapp, setWhatsapp] = useState('');
   const [programId, setProgramId] = useState(preselectedProgram ? preselectedProgram.id : programs[0]?.id || '');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) setProgramId(preselectedProgram?.id || programs[0]?.id || '');
+  }, [isOpen, preselectedProgram?.id, programs]);
 
   if (!isOpen) return null;
 
@@ -58,7 +64,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, p
           Mulai Langkah Studi Al-Azhar
         </h3>
         <p className="text-xs sm:text-sm text-elwafa-text-muted mt-1 mb-6">
-          Buat akun pendaftaran santri baru untuk mengakses formulir biodata dan jadwal seleksi.
+Simulasi portal lokal tanpa akun asli. Gunakan identitas fiktif saja; data disimpan hanya di browser ini dan bukan pendaftaran resmi.
         </p>
 
         {error && (

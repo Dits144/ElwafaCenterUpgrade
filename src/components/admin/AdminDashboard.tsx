@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { RouteErrorBoundary } from '../common/RouteErrorBoundary';
 import { useApp } from '../../context/AppContext';
-import { Student, Program, Article } from '../../types';
+import { ServerInbox } from './ServerInbox';
+import { MessagesSquare } from 'lucide-react';
+
+import { Student, Program, Article, CalendarEvent } from '../../types';
 import { 
   Users, 
   FileCheck, 
@@ -27,14 +32,26 @@ import {
   Edit,
   ExternalLink,
   ChevronRight,
-  Info
+  Info,
+  CalendarDays,
+  BarChart3,
+  Settings,
+  Layers,
+  GraduationCap,
+  TrendingUp,
+  Award,
+  BellRing
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
-  const { 
+  const reducedMotion = useReducedMotion();
+  const {
     students, 
     programs, 
     articles,
+    calendarEvents,
+    addCalendarEvent,
+    deleteCalendarEvent,
     adminApproveApplication, 
     adminRequestRevision, 
     adminRejectApplication, 
@@ -51,7 +68,8 @@ export const AdminDashboard: React.FC = () => {
     showToast 
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'students' | 'programs' | 'articles'>('students');
+  const [activeTab, setActiveTab] = useState<'students' | 'programs' | 'articles' | 'calendar' | 'analytics' | 'settings' | 'inbox'>('students');
+
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
@@ -65,7 +83,7 @@ export const AdminDashboard: React.FC = () => {
   const [editingArticleId, setEditingArticleId] = useState<string | null>(null);
   const [articleForm, setArticleForm] = useState<{
     title: string;
-    category: 'Akademik' | 'Kegiatan' | 'Prestasi' | 'Kerjasama' | 'Pengumuman';
+    category: Article['category'];
     author: string;
     readTime: string;
     summary: string;
@@ -79,7 +97,7 @@ export const AdminDashboard: React.FC = () => {
     readTime: '3 menit',
     summary: '',
     content: '',
-    image: '/assets/gallery/01.jpeg',
+    image: '/assets/gallery/1.jpeg',
     status: 'PUBLISHED'
   });
 
@@ -94,7 +112,29 @@ export const AdminDashboard: React.FC = () => {
     quota: 50,
     description: '',
     highlightsText: 'Bimbingan Kitab Turats\nKarantina Bahasa Arab\nLegalitas Kemenkumham\nPendampingan Visa',
-    image: '/assets/02.png'
+    image: '/assets/8.jpeg'
+  });
+
+  // Calendar Event Modal State
+  const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
+  const [calendarForm, setCalendarForm] = useState<{
+    title: string;
+    date: string;
+    time: string;
+    location: string;
+    category: CalendarEvent['category'];
+    description: string;
+    quotaTarget: number;
+    status: CalendarEvent['status'];
+  }>({
+    title: '',
+    date: new Date().toISOString().split('T')[0],
+    time: '08:30 WIB',
+    location: 'Sekretariat Elwafa Bogor',
+    category: 'SELEKSI',
+    description: '',
+    quotaTarget: 50,
+    status: 'UPCOMING'
   });
 
   // Metrics KPI calculations
@@ -140,8 +180,7 @@ export const AdminDashboard: React.FC = () => {
       adminRejectApplication(selectedStudent.id, decisionNotes);
     }
 
-    const updated = students.find((s) => s.id === selectedStudent.id);
-    if (updated) setSelectedStudent(updated);
+    setSelectedStudent(null);
     setDecisionAction(null);
     setDecisionNotes('');
   };
@@ -156,9 +195,9 @@ export const AdminDashboard: React.FC = () => {
       readTime: '3 menit',
       summary: '',
       content: '',
-      image: '/assets/gallery/01.jpeg',
+      image: '/assets/gallery/1.jpeg',
       status: 'PUBLISHED'
-    });
+      });
     setIsArticleModalOpen(true);
   };
 
@@ -225,8 +264,8 @@ export const AdminDashboard: React.FC = () => {
       quota: 40,
       description: '',
       highlightsText: 'Bimbingan Masyaikh\nKarantina Bahasa Arab\nLegalitas Kemenkumham\nAsrama di Kairo',
-      image: '/assets/02.png'
-    });
+      image: '/assets/8.jpeg'
+      });
     setIsProgramModalOpen(true);
   };
 
@@ -271,12 +310,43 @@ export const AdminDashboard: React.FC = () => {
     setIsProgramModalOpen(false);
   };
 
+  const handleSaveCalendarEvent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!calendarForm.title.trim()) {
+      showToast('Judul kegiatan / agenda seleksi wajib diisi.', 'warning');
+      return;
+    }
+
+    addCalendarEvent({
+      title: calendarForm.title,
+      date: calendarForm.date,
+      time: calendarForm.time,
+      location: calendarForm.location,
+      category: calendarForm.category,
+      description: calendarForm.description,
+      quotaTarget: Number(calendarForm.quotaTarget) || 50,
+      status: calendarForm.status
+    });
+
+    setIsCalendarModalOpen(false);
+    setCalendarForm({
+      title: '',
+      date: new Date().toISOString().split('T')[0],
+      time: '08:30 WIB',
+      location: 'Sekretariat Elwafa Bogor',
+      category: 'SELEKSI',
+      description: '',
+      quotaTarget: 50,
+      status: 'UPCOMING'
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-elwafa-surface pb-28">
+    <div className="min-h-screen min-w-0 bg-elwafa-surface pb-28">
       {/* Top Admin Navigation Header */}
       <div className="bg-elwafa-ocean-dark text-white border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={() => setRole('visitor')}
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-colors"
@@ -287,9 +357,9 @@ export const AdminDashboard: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-elwafa-gold/20 border border-elwafa-gold/30 flex items-center justify-center shrink-0">
               <ShieldCheck className="w-6 h-6 text-elwafa-gold" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-white tracking-tight">
+            <div className="min-w-0">
+              <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2">
+                <h1 className="text-base sm:text-lg font-bold text-white tracking-tight leading-tight">
                   Dashboard Administrasi &amp; Verifikator
                 </h1>
                 <span className="px-2 py-0.5 rounded-full bg-elwafa-gold/20 text-elwafa-gold text-[10px] font-bold">
@@ -304,7 +374,16 @@ export const AdminDashboard: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => showToast('Mengekspor rekap pendaftar format Excel/CSV...', 'info')}
+              onClick={() => {
+                const fields = ['ID', 'Nama', 'Program', 'Status', 'Tanggal Daftar'];
+                const rows = students.map((s) => [s.id, s.name, s.selectedProgramName, s.status, s.registrationDate]);
+                const csv = [fields, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' }));
+                link.download = 'elwafa-demo-pendaftar.csv';
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+              }}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors border border-white/10"
             >
               <Download className="w-3.5 h-3.5" />
@@ -313,26 +392,30 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Tab Headers: Afwaja Architecture */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto gap-2 border-t border-white/10 pt-2 pb-0">
+        {/* Mobile/tablet navigation shows every page without hidden horizontal tabs. */}
+        <div aria-label="Navigasi admin" className="mx-auto grid max-w-7xl grid-cols-2 gap-2 border-t border-white/10 px-3 py-3 sm:grid-cols-3 sm:px-6 lg:hidden">
           {[
-            { id: 'students', label: 'Kelola Mahasiswa / Pendaftar', count: pendingCount, icon: <Users className="w-4 h-4" /> },
-            { id: 'programs', label: 'Kelola Program & Kuota', count: programs.length, icon: <BookOpen className="w-4 h-4" /> },
-            { id: 'articles', label: 'Kelola Berita & Artikel', count: articles.length, icon: <Newspaper className="w-4 h-4" /> },
+            { id: 'inbox', label: 'Inbox Tim & Inquiry', count: undefined, icon: <MessagesSquare className="w-4 h-4" /> },
+            { id: 'students', label: 'Kelola Mahasiswa', count: pendingCount, icon: <Users className="w-4 h-4" /> },
+            { id: 'programs', label: 'Kelola Program', count: programs.length, icon: <BookOpen className="w-4 h-4" /> },
+            { id: 'articles', label: 'Kelola Berita', count: articles.length, icon: <Newspaper className="w-4 h-4" /> },
+            { id: 'calendar', label: 'Kalender Seleksi', count: calendarEvents.length, icon: <CalendarDays className="w-4 h-4" /> },
+            { id: 'analytics', label: 'Statistik & Analitik', count: undefined, icon: <BarChart3 className="w-4 h-4" /> },
+            { id: 'settings', label: 'Pengaturan', count: undefined, icon: <Settings className="w-4 h-4" /> },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all ${
+              className={`flex min-w-0 min-h-11 items-center gap-2 rounded-xl border px-2.5 py-2 text-left text-[11px] leading-tight sm:text-xs font-semibold transition-colors cursor-pointer ${
                 activeTab === tab.id
                   ? 'border-elwafa-gold text-elwafa-gold bg-white/5'
                   : 'border-transparent text-white/70 hover:text-white hover:bg-white/5'
               }`}
             >
-              {tab.icon}
-              <span>{tab.label}</span>
+              <span className="shrink-0">{tab.icon}</span>
+              <span className="min-w-0 break-words">{tab.label}</span>
               {tab.count !== undefined && (
-                <span className={`px-2 py-0.2 rounded-full text-[10px] font-bold ${
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                   tab.id === 'students' && pendingCount > 0
                     ? 'bg-amber-500 text-white'
                     : 'bg-white/20 text-white'
@@ -345,41 +428,107 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      {/* Main Layout Container with Professional Sidebar & Content */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-8 min-w-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-start min-w-0">
+          
+          {/* SIDEBAR NAVIGATION (3 COLS) */}
+          <aside className="hidden lg:block lg:col-span-3 bg-white rounded-3xl p-5 border border-elwafa-surface-border shadow-soft sticky top-24 space-y-6">
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-elwafa-teal block mb-1">
+                Navigasi Utama
+              </span>
+              <h3 className="text-sm font-black text-elwafa-ocean">Admin Control Center</h3>
+            </div>
 
-        {/* Top Metric KPI Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-2xl border border-elwafa-surface-border shadow-soft">
+            <nav className="space-y-1.5">
+              {[
+                { id: 'inbox', label: 'Inbox Tim & Inquiry', count: undefined, icon: <MessagesSquare className="w-4 h-4" /> },
+                { id: 'students', label: 'Kelola Mahasiswa', count: pendingCount, icon: <Users className="w-4 h-4" /> },
+                { id: 'programs', label: 'Program & Kuota', count: programs.length, icon: <BookOpen className="w-4 h-4" /> },
+                { id: 'articles', label: 'Berita & Artikel', count: articles.length, icon: <Newspaper className="w-4 h-4" /> },
+                { id: 'calendar', label: 'Kalender Seleksi', count: calendarEvents.length, icon: <CalendarDays className="w-4 h-4" /> },
+                { id: 'analytics', label: 'Analitik Kapasitas', count: undefined, icon: <BarChart3 className="w-4 h-4" /> },
+                { id: 'settings', label: 'Pengaturan Sistem', count: undefined, icon: <Settings className="w-4 h-4" /> },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id as any)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === item.id
+                      ? 'bg-elwafa-ocean text-white shadow-xs'
+                      : 'text-elwafa-text-main hover:bg-elwafa-surface hover:text-elwafa-ocean'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </div>
+                  {item.count !== undefined && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      item.id === 'students' && pendingCount > 0
+                        ? 'bg-amber-500 text-white'
+                        : activeTab === item.id ? 'bg-white/20 text-white' : 'bg-elwafa-surface text-elwafa-text-muted'
+                    }`}>
+                      {item.count}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </nav>
+
+            <div className="pt-4 border-t border-elwafa-surface-border">
+              <div className="p-3 bg-elwafa-teal/10 rounded-2xl border border-elwafa-teal/20 text-xs">
+                <div className="flex items-center gap-1.5 font-bold text-elwafa-teal mb-1">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Role Aktif</span>
+                </div>
+                <p className="text-[11px] text-elwafa-ocean font-medium">Administrator &amp; Verifikator Dokumen</p>
+                <button
+                  onClick={() => setRole('visitor')}
+                  className="mt-2 text-[10px] font-bold text-elwafa-teal hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Buka Beranda Publik →</span>
+                </button>
+              </div>
+            </div>
+          </aside>
+
+          {/* MAIN CONTENT WORKSPACE (9 COLS) */}
+          <motion.main key={activeTab} initial={reducedMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reducedMotion ? 0 : 0.24, ease: 'easeOut' }} className="min-w-0 lg:col-span-9 space-y-5 sm:space-y-8">
+
+        {/* Metrics belong to registration/analytics, not every workspace. */}
+        {(activeTab === 'students' || activeTab === 'analytics') && <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-5 gap-2 sm:gap-4 mb-5 sm:mb-8">
+          <div className="bg-white p-3 sm:p-5 rounded-2xl border border-elwafa-surface-border shadow-soft">
             <span className="text-xs font-semibold text-elwafa-text-muted">Total Pendaftar</span>
             <div className="mt-2 text-2xl font-black text-elwafa-ocean">{totalStudents}</div>
             <span className="text-[10px] text-elwafa-teal font-semibold">Tahun Ajaran 2026/2027</span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-l-blue-500 border-elwafa-surface-border shadow-soft">
+          <div className="bg-white p-3 sm:p-5 rounded-2xl border-l-4 border-l-blue-500 border-elwafa-surface-border shadow-soft">
             <span className="text-xs font-semibold text-blue-700">Perlu Verifikasi (Pending)</span>
             <div className="mt-2 text-2xl font-black text-blue-700">{pendingCount}</div>
             <span className="text-[10px] text-elwafa-text-muted">Butuh tindakan admin</span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-l-emerald-500 border-elwafa-surface-border shadow-soft">
+          <div className="bg-white p-3 sm:p-5 rounded-2xl border-l-4 border-l-emerald-500 border-elwafa-surface-border shadow-soft">
             <span className="text-xs font-semibold text-emerald-700">Disetujui (ACC)</span>
             <div className="mt-2 text-2xl font-black text-emerald-700">{approvedCount}</div>
             <span className="text-[10px] text-emerald-600 font-semibold">Siap masuk karantina</span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-l-amber-500 border-elwafa-surface-border shadow-soft">
+          <div className="bg-white p-3 sm:p-5 rounded-2xl border-l-4 border-l-amber-500 border-elwafa-surface-border shadow-soft">
             <span className="text-xs font-semibold text-amber-700">Perlu Revisi</span>
             <div className="mt-2 text-2xl font-black text-amber-700">{revisionCount}</div>
             <span className="text-[10px] text-amber-600 font-semibold">Menunggu santri upload</span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border-l-4 border-l-red-500 border-elwafa-surface-border shadow-soft col-span-2 sm:col-span-1">
+          <div className="bg-white p-3 sm:p-5 rounded-2xl border-l-4 border-l-red-500 border-elwafa-surface-border shadow-soft col-span-2 sm:col-span-1">
             <span className="text-xs font-semibold text-red-700">Ditolak</span>
             <div className="mt-2 text-2xl font-black text-red-700">{rejectedCount}</div>
             <span className="text-[10px] text-red-600 font-semibold">Tidak memenuhi syarat</span>
           </div>
-        </div>
+        </div>}
 
         {/* TAB 1: KELOLA MAHASISWA / PENDAFTAR */}
         {activeTab === 'students' && (
@@ -425,8 +574,23 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Students Table */}
-            <div className="bg-white rounded-2xl border border-elwafa-surface-border shadow-soft overflow-hidden">
+            {/* Mobile student cards keep review actions accessible without horizontal scrolling. */}
+            <div className="space-y-3 md:hidden">
+              {filteredStudents.length === 0 && <p className="rounded-2xl border bg-white p-5 text-sm text-elwafa-text-muted">Tidak ditemukan data pendaftar.</p>}
+              {filteredStudents.map((s) => (
+                <article key={s.id} className="min-w-0 rounded-2xl border border-elwafa-surface-border bg-white p-4 shadow-soft">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0"><h3 className="break-words text-sm font-bold text-elwafa-ocean">{s.name}</h3><p className="text-[11px] font-mono text-elwafa-teal">{s.id}</p></div>
+                    <span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ${s.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' : s.status === 'REJECTED' ? 'bg-red-100 text-red-800' : s.status === 'REVISION_REQUIRED' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>{s.status === 'APPROVED' ? 'Disetujui' : s.status === 'REJECTED' ? 'Ditolak' : s.status === 'REVISION_REQUIRED' ? 'Revisi' : 'Pending'}</span>
+                  </div>
+                  <p className="mt-3 break-words text-xs font-semibold text-elwafa-ocean">{s.selectedProgramName}</p>
+                  <p className="mt-1 break-words text-xs text-elwafa-text-muted">{s.originCity} · {s.registrationDate}</p>
+                  <div className="mt-4 flex flex-wrap gap-2"><button onClick={() => handleOpenReview(s)} className="rounded-lg bg-elwafa-ocean px-3 py-2 text-xs font-bold text-white">Review Berkas</button><button onClick={() => { setActiveStudentId(s.id); setRole('student'); }} className="rounded-lg border border-elwafa-surface-border px-3 py-2 text-xs font-bold text-elwafa-ocean">Lihat Portal</button></div>
+                </article>
+              ))}
+            </div>
+            {/* Desktop student table */}
+            <div className="hidden md:block bg-white rounded-2xl border border-elwafa-surface-border shadow-soft overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-elwafa-surface-subtle text-elwafa-ocean uppercase tracking-wider font-bold border-b border-elwafa-surface-border">
@@ -598,13 +762,14 @@ export const AdminDashboard: React.FC = () => {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => {
-                              const newQuota = prompt(`Ubah jumlah kuota untuk ${prog.title}:`, String(prog.quota));
-                              if (newQuota && !isNaN(Number(newQuota))) {
-                                updateProgram(prog.id, { quota: Number(newQuota) });
-                              }
+                              setEditingProgramId(prog.id);
+                              setProgramForm({ title: prog.title, category: prog.category, duration: prog.duration,
+                                schedule: prog.schedule, quota: prog.quota, description: prog.description,
+                                highlightsText: prog.highlights.join('\n'), image: prog.image });
+                              setIsProgramModalOpen(true);
                             }}
                             className="px-2.5 py-1.5 bg-white border border-elwafa-surface-border rounded-lg text-xs font-medium text-elwafa-ocean hover:bg-elwafa-surface-subtle"
-                            title="Edit Kuota"
+                            title="Edit Program"
                           >
                             Edit
                           </button>
@@ -651,8 +816,24 @@ export const AdminDashboard: React.FC = () => {
                 </button>
               </div>
 
-              {/* Table of Articles */}
-              <div className="overflow-x-auto">
+              {/* Mobile article list */}
+              <div className="space-y-3 md:hidden">
+                {articles.map((art) => (
+                  <article key={art.id} className="min-w-0 rounded-xl border border-elwafa-surface-border bg-elwafa-surface p-4">
+                    <h4 className="break-words text-sm font-bold text-elwafa-ocean">{art.title}</h4>
+                    <p className="mt-1 line-clamp-2 text-xs text-elwafa-text-muted">{art.summary}</p>
+                    <p className="mt-2 text-xs text-elwafa-text-muted">{art.category} · {art.date}</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <button onClick={() => updateArticle(art.id, { status: art.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED' })} className="rounded-lg border border-elwafa-surface-border bg-white px-3 py-2 text-xs font-semibold">{art.status === 'PUBLISHED' ? 'Terbit · jadikan draf' : 'Draf · terbitkan'}</button>
+                      <button onClick={() => setSelectedArticle(art)} className="rounded-lg border border-elwafa-surface-border bg-white px-3 py-2 text-xs">Pratinjau</button>
+                      <button onClick={() => handleEditArticle(art)} className="rounded-lg border border-elwafa-surface-border bg-white px-3 py-2 text-xs">Edit</button>
+                      <button onClick={() => { if (confirm(`Hapus artikel "${art.title}"?`)) deleteArticle(art.id); }} className="rounded-lg border border-red-200 bg-white px-3 py-2 text-xs text-red-700">Hapus</button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              {/* Desktop article table */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-elwafa-surface-subtle text-elwafa-ocean uppercase tracking-wider font-bold border-b border-elwafa-surface-border">
                     <tr>
@@ -733,6 +914,241 @@ export const AdminDashboard: React.FC = () => {
           </div>
         )}
 
+        {activeTab === 'inbox' && <RouteErrorBoundary routeKey="inbox"><ServerInbox /></RouteErrorBoundary>}
+
+        {/* TAB 4: KALENDER & AGENDA SELEKSI MAHASISWA */}
+        {activeTab === 'calendar' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl p-6 border border-elwafa-surface-border shadow-soft flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-elwafa-teal/10 text-elwafa-teal text-xs font-bold uppercase tracking-wider mb-2">
+                  <CalendarDays className="w-3.5 h-3.5" />
+                  <span>Agenda &amp; Jadwal Seleksi Akademik</span>
+                </div>
+                <h2 className="text-xl font-black text-elwafa-ocean">
+                  Kalender Seleksi &amp; Kegiatan Santri
+                </h2>
+                <p className="text-xs text-elwafa-text-muted mt-1">
+                  Atur tanggal penting seleksi Diktis Kemenag, ujian Hadatsah Mu'adalah, karantina, dan pelepasan kloter santri ke Kairo.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setIsCalendarModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-elwafa-teal hover:bg-elwafa-teal-dark text-white text-xs font-bold shadow-md transition-all cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah Jadwal Seleksi Baru</span>
+              </button>
+            </div>
+
+            {/* Calendar Events List Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {calendarEvents.map((evt) => {
+                const categoryColors: Record<string, string> = {
+                  SELEKSI: 'bg-red-50 text-red-700 border-red-200',
+                  TRYOUT: 'bg-amber-50 text-amber-700 border-amber-200',
+                  ADMINISTRASI: 'bg-blue-50 text-blue-700 border-blue-200',
+                  DAUROH: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                  KEBERANGKATAN: 'bg-purple-50 text-purple-700 border-purple-200',
+                };
+                return (
+                  <div key={evt.id} className="bg-white rounded-3xl p-6 border border-elwafa-surface-border shadow-soft hover:shadow-elevated transition-all flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border ${categoryColors[evt.category] || 'bg-gray-100 text-gray-700'}`}>
+                          {evt.category}
+                        </span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                          evt.status === 'ONGOING' 
+                            ? 'bg-emerald-500 text-white animate-pulse' 
+                            : evt.status === 'COMPLETED' 
+                              ? 'bg-gray-200 text-gray-700' 
+                              : 'bg-elwafa-surface text-elwafa-teal'
+                        }`}>
+                          {evt.status === 'ONGOING' ? 'HARI INI BERLANGSUNG' : evt.status}
+                        </span>
+                      </div>
+
+                      <h3 className="text-sm font-extrabold text-elwafa-ocean mb-2 leading-snug">
+                        {evt.title}
+                      </h3>
+
+                      <p className="text-xs text-elwafa-text-muted leading-relaxed mb-4">
+                        {evt.description}
+                      </p>
+
+                      <div className="space-y-2 text-xs text-elwafa-text-main border-t border-elwafa-surface-border pt-3">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-3.5 h-3.5 text-elwafa-teal shrink-0" />
+                          <span className="font-semibold">{evt.date}</span>
+                          {evt.time && <span className="text-elwafa-text-muted">• {evt.time}</span>}
+                        </div>
+                        {evt.location && (
+                          <div className="flex items-center gap-2 text-elwafa-text-muted">
+                            <MapPin className="w-3.5 h-3.5 text-elwafa-gold shrink-0" />
+                            <span className="line-clamp-1">{evt.location}</span>
+                          </div>
+                        )}
+                        {evt.quotaTarget && (
+                          <div className="flex items-center gap-2 text-elwafa-text-muted">
+                            <Users className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                            <span>Target Kuota: <strong>{evt.quotaTarget} Peserta</strong></span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-elwafa-surface-border mt-4 flex items-center justify-between">
+                      <span className="text-[10px] text-elwafa-text-muted font-mono">{evt.id}</span>
+                      <button
+                        onClick={() => {
+                          if (confirm(`Hapus agenda seleksi "${evt.title}"?`)) {
+                            deleteCalendarEvent(evt.id);
+                          }
+                        }}
+                        className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                        title="Hapus Jadwal"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 5: STATISTIK & ANALITIK KUOTA PROGRAM */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl p-6 border border-elwafa-surface-border shadow-soft">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-elwafa-teal mb-2">
+                <BarChart3 className="w-4 h-4" />
+                <span>Monitoring Kapasitas Asrama &amp; Kuota</span>
+              </div>
+              <h2 className="text-xl font-black text-elwafa-ocean">
+                Analitik Kuota &amp; Ketersediaan Program 2026/2027
+              </h2>
+              <p className="text-xs text-elwafa-text-muted mt-1">
+                Pantau okupansi asrama Bogor, flat Kairo, dan rasio kelulusan seleksi berkas calon mahasiswa secara transparan.
+              </p>
+            </div>
+
+            {/* Quota Progress Breakdown Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {programs.map((prog) => {
+                const percent = Math.min(100, Math.round((prog.enrolledCount / (prog.quota || 1)) * 100));
+                const sisa = Math.max(0, prog.quota - prog.enrolledCount);
+                return (
+                  <div key={prog.id} className="bg-white rounded-3xl p-6 border border-elwafa-surface-border shadow-soft flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-elwafa-teal/10 text-elwafa-teal uppercase">
+                          {prog.category}
+                        </span>
+                        <span className="text-xs font-bold text-elwafa-ocean">
+                          {percent}% Terisi
+                        </span>
+                      </div>
+
+                      <h3 className="text-sm font-extrabold text-elwafa-ocean mb-1">
+                        {prog.title}
+                      </h3>
+                      <p className="text-xs text-elwafa-text-muted mb-4">{prog.duration} • {prog.schedule}</p>
+
+                      {/* Progress Bar */}
+                      <div className="w-full h-3 bg-elwafa-surface rounded-full overflow-hidden mb-3">
+                        <div 
+                          className="h-full bg-gradient-to-r from-elwafa-teal to-elwafa-gold rounded-full transition-all duration-500"
+                          style={{ width: `${percent}%` }}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs text-elwafa-text-main pt-2">
+                        <div className="p-2.5 bg-elwafa-surface rounded-xl">
+                          <span className="text-[10px] text-elwafa-text-muted block">Santri Terdaftar</span>
+                          <strong className="text-sm text-elwafa-ocean">{prog.enrolledCount}</strong>
+                        </div>
+                        <div className="p-2.5 bg-elwafa-surface rounded-xl">
+                          <span className="text-[10px] text-elwafa-text-muted block">Sisa Kursi</span>
+                          <strong className="text-sm text-amber-600">{sisa} Kursi</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-elwafa-surface-border mt-4 flex items-center justify-between text-xs">
+                      <span className="text-elwafa-text-muted">Total Kuota: <strong>{prog.quota}</strong></span>
+                      <button
+                        onClick={() => {
+                          const newQuota = prompt(`Ubah total kuota untuk "${prog.title}":`, String(prog.quota));
+                          if (newQuota && !isNaN(Number(newQuota))) {
+                            updateProgram(prog.id, { quota: Number(newQuota) });
+                            showToast(`Kuota ${prog.title} berhasil diperbarui menjadi ${newQuota}!`, 'success');
+                          }
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-elwafa-ocean text-white font-bold text-[11px] hover:bg-elwafa-ocean-light cursor-pointer"
+                      >
+                        Edit Kuota
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 6: PENGATURAN SISTEM & MASTER DATA */}
+        {activeTab === 'settings' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-elwafa-surface-border shadow-soft max-w-4xl">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-elwafa-teal mb-2">
+                <Settings className="w-4 h-4" />
+                <span>Pengaturan &amp; Legalitas Lembaga</span>
+              </div>
+              <h2 className="text-xl font-black text-elwafa-ocean mb-1">
+                Profil Lembaga Elwafa Center
+              </h2>
+              <p className="text-xs text-elwafa-text-muted mb-6">
+                Data resmi yang digunakan dalam kuitansi pendaftaran, surat pengantar seleksi, dan sertifikat kelulusan daurah.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-elwafa-text-main mb-6">
+                <div className="p-4 bg-elwafa-surface rounded-2xl border border-elwafa-surface-border">
+                  <span className="text-elwafa-text-muted block mb-1">Nama Resmi Lembaga:</span>
+                  <strong className="text-sm text-elwafa-ocean">Yayasan Elwafa Center Indonesia</strong>
+                </div>
+                <div className="p-4 bg-elwafa-surface rounded-2xl border border-elwafa-surface-border">
+                  <span className="text-elwafa-text-muted block mb-1">Direktur &amp; Pengasuh:</span>
+                  <strong className="text-sm text-elwafa-ocean">Ustadz Ihsan Efendi, Lc</strong>
+                </div>
+                <div className="p-4 bg-elwafa-surface rounded-2xl border border-elwafa-surface-border">
+                  <span className="text-elwafa-text-muted block mb-1">Alamat Asrama Bogor:</span>
+                  <strong>Perum Pondok Mutiara Blok D1/06 Sasakpanjang, Tajurhalang, Kab. Bogor</strong>
+                </div>
+                <div className="p-4 bg-elwafa-surface rounded-2xl border border-elwafa-surface-border">
+                  <span className="text-elwafa-text-muted block mb-1">Kantor Cabang Kairo:</span>
+                  <strong>Hayy Ats-Tsamien, Madinat Nasr, Kairo, Mesir</strong>
+                </div>
+              </div>
+
+              <div className="p-5 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-900 flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold mb-1">Integritas Data Sesuai Master Prompt</h4>
+                  <p className="leading-relaxed text-amber-800">
+                    Sistem Elwafa Center berpedoman pada bimbingan persiapan resmi tanpa klaim fiktif kelulusan 100% otomatis. Seluruh kelulusan seleksi S1 Al-Azhar ditetapkan oleh Kemenag RI dan Rektorat Universitas Al-Azhar Kairo.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+          </motion.main>
+        </div>
       </div>
 
       {/* VERIFICATION DETAIL DRAWER / MODAL */}
@@ -980,10 +1396,12 @@ export const AdminDashboard: React.FC = () => {
                     onChange={(e) => setArticleForm({ ...articleForm, category: e.target.value as any })}
                     className="w-full p-2.5 bg-elwafa-surface border border-elwafa-surface-border rounded-xl focus:ring-2 focus:ring-elwafa-teal"
                   >
-                    <option value="Kegiatan">Kegiatan Santri</option>
+                    <option value="TERKINI">TERKINI</option>
+                    <option value="SEPUTAR AL-AZHAR">SEPUTAR AL-AZHAR</option>
+                    <option value="REKOMENDASI">REKOMENDASI</option>
+                    <option value="KEGIATAN">KEGIATAN</option>
+                    <option value="PENDIDIKAN">PENDIDIKAN</option>
                     <option value="Akademik">Akademik &amp; Seleksi</option>
-                    <option value="Prestasi">Prestasi</option>
-                    <option value="Kerjasama">Kerjasama Resmi</option>
                     <option value="Pengumuman">Pengumuman</option>
                   </select>
                 </div>
@@ -1019,12 +1437,16 @@ export const AdminDashboard: React.FC = () => {
                     onChange={(e) => setArticleForm({ ...articleForm, image: e.target.value })}
                     className="w-full p-2.5 bg-elwafa-surface border border-elwafa-surface-border rounded-xl focus:ring-2 focus:ring-elwafa-teal font-mono text-[11px]"
                   >
-                    <option value="/assets/gallery/01.jpeg">/assets/gallery/01.jpeg</option>
-                    <option value="/assets/gallery/02.jpeg">/assets/gallery/02.jpeg</option>
-                    <option value="/assets/gallery/03.jpeg">/assets/gallery/03.jpeg</option>
-                    <option value="/assets/gallery/04.jpeg">/assets/gallery/04.jpeg</option>
-                    <option value="/assets/02.png">/assets/02.png</option>
-                    <option value="/assets/background.jpeg">/assets/background.jpeg</option>
+                    <option value="/assets/gallery/1.jpeg">/assets/gallery/1.jpeg (Alexandria)</option>
+                    <option value="/assets/gallery/2.jpeg">/assets/gallery/2.jpeg (Montaza)</option>
+                    <option value="/assets/gallery/5.jpeg">/assets/gallery/5.jpeg (Ziarah Mamluk)</option>
+                    <option value="/assets/gallery/14.jpeg">/assets/gallery/14.jpeg (Study Hall)</option>
+                    <option value="/assets/8.jpeg">/assets/8.jpeg (Mahasiswa Al-Azhar)</option>
+                    <option value="/assets/tentang-elwafa.jpeg">/assets/tentang-elwafa.jpeg (Monumen Kairo)</option>
+                    <option value="/assets/gallery/9.jpeg">/assets/gallery/9.jpeg (Talaqqi Kairo)</option>
+                    <option value="/assets/before footer.jpeg">/assets/before footer.jpeg (Al-Azhar Wafidin)</option>
+                    <option value="/assets/articles/pexels-iramezatil-739231740-20682503-scaled.jpg">/assets/articles/... (Masjid Al-Azhar)</option>
+                    <option value="/assets/articles/DSC03995-scaled.jpg">/assets/articles/... (CBT Hall Al-Azhar)</option>
                   </select>
                 </div>
               </div>
@@ -1180,6 +1602,145 @@ export const AdminDashboard: React.FC = () => {
                   className="px-5 py-2 rounded-xl bg-elwafa-teal hover:bg-elwafa-teal-dark text-white font-bold shadow-md"
                 >
                   Simpan Program
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CALENDAR EVENT MODAL (TAMBAH AGENDA SELEKSI / HARI INI SELEKSI) */}
+      {isCalendarModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-elwafa-surface-border overflow-hidden">
+            <div className="p-6 bg-elwafa-ocean-dark text-white flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-white">Tambah Agenda Seleksi Baru</h3>
+                <p className="text-xs text-white/70">Jadwalkan agenda ujian, CBT, karantina, atau keberangkatan</p>
+              </div>
+              <button
+                onClick={() => setIsCalendarModalOpen(false)}
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white/80"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCalendarEvent} className="p-6 space-y-4 text-xs">
+              <div>
+                <label className="font-bold text-elwafa-ocean block mb-1">
+                  Nama Agenda / Kegiatan <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Contoh: Seleksi CBT Tahfidz & Bahasa Kemenag (Diktis)"
+                  value={calendarForm.title}
+                  onChange={(e) => setCalendarForm({ ...calendarForm, title: e.target.value })}
+                  className="w-full p-2.5 bg-elwafa-surface border border-elwafa-surface-border rounded-xl focus:ring-2 focus:ring-elwafa-teal"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-elwafa-ocean block mb-1">Kategori Agenda</label>
+                  <select
+                    value={calendarForm.category}
+                    onChange={(e) => setCalendarForm({ ...calendarForm, category: e.target.value as any })}
+                    className="w-full p-2.5 bg-elwafa-surface border border-elwafa-surface-border rounded-xl focus:ring-2 focus:ring-elwafa-teal"
+                  >
+                    <option value="SELEKSI">SELEKSI (CBT &amp; Lisan)</option>
+                    <option value="TRYOUT">TRYOUT Akbar</option>
+                    <option value="ADMINISTRASI">ADMINISTRASI &amp; Berkas</option>
+                    <option value="DAUROH">DAUROH &amp; Karantina</option>
+                    <option value="KEBERANGKATAN">KEBERANGKATAN (Kairo)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-bold text-elwafa-ocean block mb-1">Status Kegiatan</label>
+                  <select
+                    value={calendarForm.status}
+                    onChange={(e) => setCalendarForm({ ...calendarForm, status: e.target.value as any })}
+                    className="w-full p-2.5 bg-elwafa-surface border border-elwafa-surface-border rounded-xl focus:ring-2 focus:ring-elwafa-teal"
+                  >
+                    <option value="UPCOMING">UPCOMING (Mendatang)</option>
+                    <option value="ONGOING">ONGOING (Hari Ini Berlangsung)</option>
+                    <option value="COMPLETED">COMPLETED (Selesai)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-elwafa-ocean block mb-1">Tanggal Pelaksanaan</label>
+                  <input
+                    type="date"
+                    value={calendarForm.date}
+                    onChange={(e) => setCalendarForm({ ...calendarForm, date: e.target.value })}
+                    className="w-full p-2.5 bg-elwafa-surface border border-elwafa-surface-border rounded-xl focus:ring-2 focus:ring-elwafa-teal"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-elwafa-ocean block mb-1">Waktu Pelaksanaan</label>
+                  <input
+                    type="text"
+                    placeholder="08:30 - 15:00 WIB"
+                    value={calendarForm.time}
+                    onChange={(e) => setCalendarForm({ ...calendarForm, time: e.target.value })}
+                    className="w-full p-2.5 bg-elwafa-surface border border-elwafa-surface-border rounded-xl focus:ring-2 focus:ring-elwafa-teal"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-elwafa-ocean block mb-1">Lokasi Kegiatan</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Asrama Elwafa Bogor"
+                    value={calendarForm.location}
+                    onChange={(e) => setCalendarForm({ ...calendarForm, location: e.target.value })}
+                    className="w-full p-2.5 bg-elwafa-surface border border-elwafa-surface-border rounded-xl focus:ring-2 focus:ring-elwafa-teal"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-elwafa-ocean block mb-1">Target Kuota Peserta</label>
+                  <input
+                    type="number"
+                    value={calendarForm.quotaTarget}
+                    onChange={(e) => setCalendarForm({ ...calendarForm, quotaTarget: Number(e.target.value) })}
+                    className="w-full p-2.5 bg-elwafa-surface border border-elwafa-surface-border rounded-xl focus:ring-2 focus:ring-elwafa-teal"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-elwafa-ocean block mb-1">Deskripsi &amp; Instruksi</label>
+                <textarea
+                  rows={3}
+                  placeholder="Keterangan materi ujian, perlengkapan yang wajib dibawa santri, dsb..."
+                  value={calendarForm.description}
+                  onChange={(e) => setCalendarForm({ ...calendarForm, description: e.target.value })}
+                  className="w-full p-2.5 bg-elwafa-surface border border-elwafa-surface-border rounded-xl focus:ring-2 focus:ring-elwafa-teal"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-elwafa-surface-border flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCalendarModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-elwafa-surface text-elwafa-ocean font-bold"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-elwafa-teal hover:bg-elwafa-teal-dark text-white font-bold shadow-md"
+                >
+                  Jadwalkan Agenda
                 </button>
               </div>
             </form>

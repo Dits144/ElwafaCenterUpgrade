@@ -1,0 +1,45 @@
+// Only synthetic SQLite bytes; verifies additive schema without touching active data.
+const assert = require('node:assert/strict');
+const initSqlJs = require('sql.js');
+
+(async () => {
+  const SQL = await initSqlJs();
+  const { applyV2Schema } = await import('./server/v2-copy-schema.mjs');
+  const legacy = new SQL.Database();
+  legacy.run(`CREATE TABLE admins(id TEXT PRIMARY KEY, name TEXT NOT NULL, password_hash TEXT NOT NULL, created_at TEXT NOT NULL);
+    CREATE TABLE sessions(token_hash TEXT PRIMARY KEY, admin_id TEXT NOT NULL, expires_at INTEGER NOT NULL);
+    CREATE TABLE inquiries(id TEXT PRIMARY KEY, name TEXT NOT NULL, phone TEXT NOT NULL DEFAULT '', subject TEXT NOT NULL, stage TEXT NOT NULL DEFAULT 'baru', agent_id TEXT, due TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL);
+    CREATE TABLE entries(id TEXT PRIMARY KEY, inquiry_id TEXT NOT NULL, author_id TEXT NOT NULL, kind TEXT NOT NULL CHECK(kind IN ('internal','outgoing')), text TEXT NOT NULL, at TEXT NOT NULL);
+    INSERT INTO admins VALUES('a1','Synthetic Admin','SYNTHETIC_HASH','2026-01-01');
+    INSERT INTO inquiries VALUES('i1','Synthetic Person','000','Question','baru','a1','','2026-01-01');
+    INSERT INTO entries VALUES('e1','i1','a1','internal','Synthetic Note','2026-01-01');`);
+  const source = Buffer.from(legacy.export());
+  const legacySource = Buffer.from(source);
+  const baseline = legacy.exec("SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")[0].values;
+  legacy.close();
+  const result = applyV2Schema(SQL, source);
+  const db = new SQL.Database(result);
+  const originalTables = db.exec("SELECT name, sql FROM sqlite_master WHERE type='table' AND name IN ('admins','sessions','inquiries','entries') ORDER BY name")[0].values;
+  assert.deepEqual(originalTables, baseline, 'legacy DDL must be identical');
+  const names = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'v2_%' ORDER BY name")[0].values.map(x => x[0]);
+  assert.deepEqual(names, ['v2_application_events', 'v2_applications', 'v2_users']);
+  assert.equal(db.exec('SELECT COUNT(*) FROM admins')[0].values[0][0], 1);
+  assert.equal(db.exec('SELECT COUNT(*) FROM entries')[0].values[0][0], 1);
+  assert.equal(db.exec('PRAGMA integrity_check')[0].values[0][0], 'ok');
+  assert.equal(db.exec('PRAGMA foreign_key_check').length, 0);
+  assert.equal(db.exec('PRAGMA user_version')[0].values[0][0], 1);
+  db.run("INSERT INTO v2_users(id,email,role,password_hash,created_at) VALUES('u1','synthetic@example.test','STUDENT','SYNTHETIC_HASH','2026-01-01')");
+  db.run("INSERT INTO v2_applications(id,student_id,status,created_at,updated_at) VALUES('app1','u1','DRAFT','2026-01-01','2026-01-01')");
+  db.run("INSERT INTO v2_application_events(id,application_id,action,created_at) VALUES('ev1','app1','CREATED','2026-01-01')");
+  assert.throws(() => db.run("INSERT INTO v2_users(id,email,role,password_hash,created_at) VALUES('u2','bad@example.test','OWNER','HASH','2026-01-01')"), /CHECK constraint/i);
+  assert.throws(() => db.run("INSERT INTO v2_applications(id,student_id,status,created_at,updated_at) VALUES('app2','u1','UNKNOWN','2026-01-01','2026-01-01')"), /CHECK constraint/i);
+  db.run('PRAGMA foreign_keys=ON');
+  assert.throws(() => db.run("INSERT INTO v2_applications(id,student_id,status,created_at,updated_at) VALUES('app3','missing','DRAFT','2026-01-01','2026-01-01')"), /FOREIGN KEY constraint/i);
+  db.close();
+  assert.deepEqual(Buffer.from(source), Buffer.from(legacySource), 'source unchanged');
+  const repeated = applyV2Schema(SQL, result);
+  const twice = new SQL.Database(repeated);
+  assert.equal(twice.exec("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE 'v2_%'")[0].values[0][0], 3);
+  twice.close();
+  console.log('V2 additive schema on synthetic copy: PASS');
+})().catch(error => { console.error(error); process.exitCode = 1; });

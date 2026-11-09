@@ -1,4 +1,4 @@
-import { Student, Program, Activity, Announcement, Article } from '../types';
+import { Student, Program, Activity, Announcement, Article, CalendarEvent } from '../types';
 
 export const INITIAL_PROGRAMS: Program[] = [
   {
@@ -24,7 +24,7 @@ export const INITIAL_PROGRAMS: Program[] = [
       'Paspor aktif minimal 18 bulan',
       'SKCK & Surat Keterangan Sehat dari Rumah Sakit'
     ],
-    image: '/assets/Hero-Image-3.2-768x768.png',
+    image: '/assets/8.jpeg',
     featured: true,
     priceNote: 'Tersedia paket karantina asrama & pendampingan flat Kairo',
     curriculum: [
@@ -76,7 +76,7 @@ export const INITIAL_PROGRAMS: Program[] = [
       'Akta Kelahiran & Kartu Keluarga dilegalisir',
       'Paspor santri aktif'
     ],
-    image: '/assets/karantina_ciamis.png',
+    image: '/assets/tentang-elwafa.jpeg',
     featured: true,
     priceNote: 'Pendampingan penuh hingga tiba di asrama Kairo',
     curriculum: [
@@ -123,7 +123,7 @@ export const INITIAL_PROGRAMS: Program[] = [
       'Sehat jasmani dan rohani',
       'Mengisi formulir komitmen kedisiplinan'
     ],
-    image: '/assets/tryout_camaba.png',
+    image: '/assets/gallery/9.jpeg',
     featured: false,
     priceNote: 'Termasuk akomodasi asrama, konsumsi, dan modul lengkap',
     curriculum: [
@@ -150,59 +150,200 @@ export const INITIAL_PROGRAMS: Program[] = [
 
 export const INITIAL_ARTICLES: Article[] = [
   {
-    id: 'art-1',
-    slug: 'skema-twinning-program-kemenag-al-azhar',
-    title: 'Skema Twinning Program Kemenag – Al-Azhar Mesir: Dua Tahun di Indonesia, Dua Tahun di Kairo',
-    category: 'Kerjasama',
-    summary: 'Kementerian Agama RI bersama Rektorat Universitas Al-Azhar memperbarui mekanisme kerjasama akademik twinning program guna mempermudah akses mahasiswa nusantara.',
-    content: `Kementerian Agama Republik Indonesia bersama jajaran pimpinan Universitas Al-Azhar Kairo resmi memperkuat kerjasama strategis melalui skema Twinning Program. Dalam skema ini, mahasiswa Indonesia memiliki opsi menempuh dua tahun pertama perkuliahan matrikulasi dan dasar syariah di lembaga mitra terakreditasi di Indonesia, kemudian melanjutkan dua tahun penyelesaian sarjana langsung di kampus Al-Azhar Kairo Mesir.
+    id: "art-afwaja-1",
+    slug: "try-out-ujian-hadatsah-muadalah-al-azhar",
+    title: "Elwafa Center Gelar Try Out Akbar! Persiapkan Camaba Hadapi Ujian Hadatsah Mu\u2019adalah",
+    category: "TERKINI",
+    summary: "Ujian Hadatsah Mu\u2019adalah (penyetaraan ijazah) merupakan tahapan krusial seleksi Al-Azhar Kairo. Santri menjalani simulasi komprehensif setelah menempuh Dauroh Ta\u2019hiliyah intensif.",
+    content: `Ciamis & Bogor – Ujian Hadatsah Mu’adalah, atau yang juga dikenal sebagai ujian penyetaraan ijazah, dilaksanakan secara serentak untuk menguji kesiapan santri menuju gerbang Universitas Al-Azhar, Mesir. 
 
-Langkah ini diapresiasi oleh banyak kalangan karena meringankan adaptasi budaya dan beban awal para santri, sekaligus memastikan kompetensi bahasa Arab dan hafalan Al-Qur'an berada pada level mutqin sebelum bertolak ke Mesir.
+Setelah menjalani Dauroh Ta’hiliyah intensif selama 40 hari, seluruh materi yang telah dipelajari dalam program tersebut diujikan dalam simulasi berstandar resmi. Mulai dari pemahaman qawaid nahwu, sharaf, muthala'ah turats, hingga hafalan Al-Qur'an dan wawancara lisan (muqabalah syakhshiyyah).
 
-Elwafa Center sebagai mitra pembinaan studi luar negeri terus memperbaharui kurikulum karantina agar selaras 100% dengan standar pengujian terbaru yang ditetapkan oleh Al-Azhar dan Diktis Kemenag.`,
-    author: 'Tim Redaksi Elwafa',
-    authorRole: 'Divisi Humas & Hubungan Luar Negeri',
-    date: '20 Oktober 2026',
-    image: '/assets/dauroh_success.png',
+Direktur Pembinaan Elwafa Center menegaskan bahwa Try Out ini bertujuan memetakan penguasaan materi santri serta membangun ketenangan psikologis saat menghadapi masyaikh penguji nantinya.`,
+    author: "Tim Akademik Elwafa",
+    authorRole: "Divisi Kurikulum & Ujian",
+    date: "12/08/2025",
+    image: "/assets/articles/DSC03995-scaled.jpg",
     status: 'PUBLISHED',
-    readTime: '4 menit baca'
+    readTime: "4 menit baca"
   },
   {
-    id: 'art-2',
-    slug: 'pelepasan-santri-karantina-ciamis-al-azhar',
-    title: 'Pelepasan 85 Santri Karantina Bahasa Arab Menuju Universitas Al-Azhar Kairo',
-    category: 'Kegiatan',
-    summary: 'Suasana haru dan khidmat menyelimuti wisuda kelulusan program karantina 3 bulan di Ciamis menjelang keberangkatan ke Bandara Soekarno-Hatta menuju Kairo.',
-    content: `Sebanyak 85 santri bimbingan Elwafa Center resmi dilepas dalam acara wisuda dan doa bersama pelepasan keberangkatan ke Mesir. Para santri telah menyelesaikan pembinaan intensif selama 3 hingga 6 bulan yang mencakup biah lughawiyyah 24 jam, penguatan hafalan Al-Qur'an bersanad, dan simulasi ujian muqabalah.
+    id: "art-afwaja-2",
+    slug: "suasana-asri-karantina-calon-azhary-ciamis",
+    title: "Suasana Asri Karantina Calon Azhary di Ciamis: Belajar di Tengah Alam yang Sejuk dan Damai",
+    category: "TERKINI",
+    summary: "Menghafal Al-Qur'an dan memperdalam bahasa Arab fusha 24 jam dengan suasana pegunungan asri, mendukung fokus dan kedisiplinan santri secara optimal.",
+    content: `Kompleks asrama karantina Elwafa di Ciamis menawarkan ekosistem pembelajaran yang dirancang khusus untuk memadukan ketenangan alam dengan kedisiplinan pondok modern.
 
-Hadir dalam acara tersebut para masyaikh alumni Al-Azhar, perwakilan pemerintah daerah, serta para orang tua dan wali santri. Direktur Elwafa Center berpesan agar para calon mahasiswa senantiasa menjaga adab, keluhuran akhlak nusantara, dan memanfaatkan kesempatan mulia belajar di kiblat keilmuan Islam tertua di dunia.`,
-    author: 'Ustadz Ahmad Fauzi',
-    authorRole: 'Koordinator Asrama Karantina',
-    date: '16 Oktober 2026',
-    image: '/assets/karantina_ciamis.png',
+Jauh dari kebisingan kota, santri menerapkan disiplin Biah Lughawiyyah (lingkungan 100% berbahasa Arab). Setiap sudut asrama menjadi halaqah ilmu, mulai dari talaqqi subuh kitab turats, setoran hafalan Al-Qur'an bersanad, hingga muhadatsah yaumiyyah bersama para asatidz lulusan Al-Azhar Kairo.`,
+    author: "Ustadz Ihsan Efendi, Lc",
+    authorRole: "Pengasuh Ma'had Karantina",
+    date: "08/08/2025",
+    image: "/assets/gallery/9.jpeg",
     status: 'PUBLISHED',
-    readTime: '3 menit baca'
+    readTime: "3 menit baca"
   },
   {
-    id: 'art-3',
-    slug: 'tips-lulus-ujian-muqabalah-bahasa-arab',
-    title: 'Panduan Praktis Menghadapi Ujian Wawancara (Muqabalah) Calon Mahasiswa Al-Azhar',
-    category: 'Akademik',
-    summary: 'Ujian wawancara bahasa Arab merupakan salah satu penentu utama kelulusan. Pelajari kriteria penilaian masyaikh dan strategi menjawab dengan percaya diri.',
-    content: `Banyak calon mahasiswa yang menguasai gramatika nahwu dan sharaf di atas kertas, namun gugup saat menghadapi penguji asli asal Mesir dalam sesi Muqabalah Syakhshiyyah.
+    id: "art-afwaja-3",
+    slug: "taqiyya-shafarani-prestasi-hadis-al-azhar",
+    title: "Taqiyya Shafarani, Camaba Asal Jakarta dengan Segudang Prestasi Hadis, Wujudkan Mimpi ke Al-Azhar Mesir",
+    category: "REKOMENDASI",
+    summary: "Kisah inspiratif santriwati berprestasi tingkat nasional yang memperdalam sanad hadits dan bahasa Arab di Elwafa Center demi menggapai kursi Fakultas Ushuluddin Kairo.",
+    content: `Bagi Taqiyya Shafarani, menuntut ilmu di universitas tertua di dunia, Al-Azhar Mesir, bukanlah sekadar impian, melainkan amanah peradaban. Santriwati berprestasi asal Jakarta ini telah mengoleksi berbagai penghargaan di bidang Musabaqah Hifdzil Hadits (MHH) tingkat nasional.
 
-Berikut adalah 4 poin krusial yang dinilai oleh tim penguji Al-Azhar:
-1. Fashahah & Makharijul Huruf: Kejelasan artikulasi saat membaca ayat suci Al-Qur'an dan teks kitab turats.
-2. Kefasihan Bahasa Fusha: Menggunakan bahasa Arab baku tanpa mencampur bahasa ammiyah atau dialek daerah.
-3. Wawasan Keislaman Moderat (Wasathiyyah): Pemahaman nilai-nilai toleransi, moderasi beragama, dan tradisi keilmuan Ahlussunnah wal Jama'ah.
-4. Adab & Ketenangan Mental: Sikap sopan, tatapan mata yang tenang, dan gestur menghormati masyaikh penguji.`,
-    author: 'Syekh Mahmud Al-Azhari',
-    authorRole: 'Konsultan Pembina Bahasa Arab',
-    date: '12 Oktober 2026',
-    image: '/assets/tryout_camaba.png',
+Bergabung bersama program bimbingan intensif Elwafa Center, Taqiyya fokus memperkuat hafalan kutubus sittah, memperdalam musthalah al-hadits, dan mengasah kefasihan fusha agar mampu bersaing di tingkat internasional di Kairo.`,
+    author: "Redaksi Elwafa Media",
+    authorRole: "Liputan Khusus Santri",
+    date: "05/08/2025",
+    image: "/assets/taqiyya_shafarani.png",
     status: 'PUBLISHED',
-    readTime: '5 menit baca'
-  }
+    readTime: "5 menit baca"
+  },
+  {
+    id: "art-afwaja-4",
+    slug: "4-fakta-menarik-tentang-al-azhar-kairo",
+    title: "4 Fakta Menarik tentang Universitas Al-Azhar Mesir yang Wajib Kamu Tahu",
+    category: "SEPUTAR AL-AZHAR",
+    summary: "Dari tradisi talaqqi di serambi masjid ribuan tahun hingga prinsip Wasathiyyah yang diakui dunia, simak mengapa Al-Azhar menjadi magnet penuntut ilmu global.",
+    content: `1. Didirikan Lebih dari 1.000 Tahun Lalu (970 Masehi): Al-Azhar adalah salah satu universitas tertua di dunia yang terus beroperasi tanpa henti mencetak ulama dan cendekiawan.
+2. Tradisi Talaqqi Bersanad di Masjid Al-Azhar: Di samping kuliah formal modern di kampus Nasr City dan Darrasah, tradisi halaqah keilmuan para masyaikh sepuh tetap hidup setiap hari.
+3. Benteng Moderasi Beragama (Wasathiyyah): Al-Azhar mengajarkan 4 mazhab fiqih secara adil dan toleran, mencetak lulusan yang berpandangan luas dan damai.
+4. Mahasiswa Asing Terbanyak di Dunia Islam: Puluhan ribu santri mancanegara dari lebih 100 negara belajar di Ma'had Bu'uts dan fakultas-fakultas Al-Azhar.`,
+    author: "Dr. Syarif Al-Azhari",
+    authorRole: "Konsultan Akademik Timur Tengah",
+    date: "30/06/2025",
+    image: "/assets/articles/pexels-iramezatil-739231740-20682503-scaled.jpg",
+    status: 'PUBLISHED',
+    readTime: "4 menit baca"
+  },
+  {
+    id: "art-afwaja-5",
+    slug: "mengenal-ujian-tahdid-mustawa-gerbang-awal-al-azhar",
+    title: "Mengenal Ujian Tahdid Mustawa: Gerbang Awal Menuju Al-Azhar, Digelar Tiap Semester",
+    category: "SEPUTAR AL-AZHAR",
+    summary: "Penjelasan menyeluruh tentang placement test (Tahdid Mustawa) Markaz Lughoh Syeikh Zayed Al-Azhar untuk menentukan level kemahiran bahasa santri baru.",
+    content: `Setiap mahasiswa baru Universitas Al-Azhar yang belum memiliki sertifikat lulusan Markaz Lughoh wajib mengikuti Ujian Tahdid Mustawa. Ujian ini menguji 4 kemahiran: Fahmul Masmu' (Listening), Fahmul Maqru' (Reading), Al-Qawaid wal Mufradat (Grammar & Vocabulary), serta Al-Kitabah wal Muhadatsah (Writing & Speaking).
+
+Hasil ujian memetakan santri ke dalam level: Mubtadi (Pemula), Mutawassith (Menengah), hingga Mutaqaddim (Mahir). Pembinaan di Elwafa Center dirancang untuk mengantarkan santri langsung mencapai level tertinggi agar dapat langsung masuk bangku kuliah sarjana tanpa masa tunggu matrikulasi yang panjang.`,
+    author: "Tim Verifikator Elwafa",
+    authorRole: "Pusat Bahasa Arab Terpadu",
+    date: "13/06/2025",
+    image: "/assets/articles/WhatsApp-Image-2025-05-03-at-22.29.32-scaled.jpeg",
+    status: 'PUBLISHED',
+    readTime: "4 menit baca"
+  },
+  {
+    id: "art-afwaja-6",
+    slug: "program-mahad-smp-sma-al-azhar-mesir",
+    title: "Program Ma\u2019had Bu'uts (SMP/SMA) di Al-Azhar Mesir: Persiapan Sedini Mungkin",
+    category: "SEPUTAR AL-AZHAR",
+    summary: "Informasi lengkap pendaftaran Ma'had Bu'uts Al-Azhar jenjang I'dadi dan Tsanawi bagi lulusan SD/MI dan SMP/MTs yang ingin menimba ilmu langsung di Kairo.",
+    content: `Banyak orang tua mengira belajar di Al-Azhar Mesir hanya diperuntukkan bagi jenjang sarjana (S1). Padahal Al-Azhar memiliki sistem sekolah formal berasrama legendaris: Ma'had Bu'uts Islamiyyah untuk jenjang setara SMP (I'dadi) dan SMA (Tsanawi).
+
+Keuntungan utama jalur ini adalah penguasaan bahasa Arab fusha yang matang sejak belia, adaptasi budaya yang lebih mudah, serta jaminan kelulusan yang langsung membuka jalur kuliah S1 Al-Azhar tanpa perlu tes Diktis penyetaraan ulang.`,
+    author: "Ustadz Ridwan Al-Hafidz",
+    authorRole: "Koordinator Program Ma'had Bu'uts",
+    date: "04/05/2025",
+    image: "/assets/articles/pexels-toulouse-19801156-scaled.jpg",
+    status: 'PUBLISHED',
+    readTime: "4 menit baca"
+  },
+  {
+    id: "art-afwaja-7",
+    slug: "bekal-penting-kuliah-ke-mesir-bahasa-atau-hafalan",
+    title: "Bekal Penting Kuliah ke Mesir: Bahasa Arab atau Hafalan Al-Qur\u2019an?",
+    category: "PENDIDIKAN",
+    summary: "Analisis komparatif tentang skala prioritas persiapan calon mahasiswa Al-Azhar: cara menyeimbangkan penguasaan lughoh dan mutqin hafalan ayat Al-Qur'an.",
+    content: `Pertanyaan yang paling sering diajukan calon santri adalah: 'Mana yang harus saya dahulukan, menuntaskan 30 juz hafalan Al-Qur'an atau memperdalam nahwu sharaf dan percakapan bahasa Arab?'
+
+Jawabannya adalah integrasi keduanya. Ujian Diktis Kemenag dan Muadalah Al-Azhar mensyaratkan kelayakan bacaan tartil dan hafalan minimal juz tertentu, sementara seluruh perkuliahan di Kairo menggunakan bahasa fusha tingkat tinggi. Di Elwafa Center, kurikulum karantina dirancang paralel agar santri tidak mengorbankan salah satunya.`,
+    author: "Ust. Ihsan Efendi, Lc",
+    authorRole: "Direktur Elwafa Center",
+    date: "03/05/2025",
+    image: "/assets/articles/pexels-a-darmel-8164749-scaled.jpg",
+    status: 'PUBLISHED',
+    readTime: "3 menit baca"
+  },
+  {
+    id: "art-afwaja-8",
+    slug: "dibuka-pendaftaran-kuliah-ke-mesir-jalur-kemenag",
+    title: "Dibuka Pendaftaran Kuliah ke Mesir Jalur Diktis Kemenag RI Tahun Akademik Baru",
+    category: "PENDIDIKAN",
+    summary: "Panduan resmi alur seleksi Computer Assisted Test (CAT), verifikasi berkas ijazah madrasah, dan tahapan wawancara kedutaan.",
+    content: `Direktorat Pendidikan Tinggi Keagamaan Islam (Diktis) Ditjen Pendis Kemenag RI resmi membuka pendaftaran uji kompetensi calon mahasiswa baru ke Universitas Al-Azhar Mesir.
+
+Jalur ini terbuka bagi santri madrasah aliyah dan pesantren se-Indonesia. Elwafa Center memfasilitasi pendampingan pendaftaran online, pelatihan intensif bank soal CBT, terjemah tersumpah ijazah, serta pembekalan wawancara muqabalah bersama alumni terbaik Al-Azhar.`,
+    author: "Humas Elwafa Center",
+    authorRole: "Informasi Beasiswa & Ujian",
+    date: "01/05/2025",
+    image: "/assets/articles/WhatsApp-Image-2025-04-28-at-09.05.00-1-scaled.jpeg",
+    status: 'PUBLISHED',
+    readTime: "4 menit baca"
+  },
+  {
+    id: "art-afwaja-9",
+    slug: "biografi-prof-amany-lubis-alumni-mahad-azhar",
+    title: "Sosok Prof. Amany Lubis: Alumnus Ma\u2019had Al-Azhar Mesir hingga Rektor Perempuan Pertama UIN Jakarta",
+    category: "REKOMENDASI",
+    summary: "Profil keteladanan tokoh ulama perempuan Indonesia yang menempuh pendidikan sejak bangku Ma'had Tsanawi Al-Azhar Kairo hingga mencapai puncak kepemimpinan akademik.",
+    content: `Prof. Dr. Hj. Amany Burhanuddin Lubis, Lc., M.A. merupakan bukti nyata keunggulan lulusan Ma'had Al-Azhar Kairo. Menyelesaikan jenjang sekolah menengah di Mesir memberi pondasi bahasa Arab dan turats yang sangat kokoh sebelum menempuh jenjang sarjana dan doktoral.
+
+Kiprah beliau di kancah nasional dan internasional membuktikan bahwa pendidikan Al-Azhar membuka peluang kiprah yang luas bagi santri putra maupun putri dalam memajukan peradaban Islam di tanah air.`,
+    author: "Tim Riset Biografi Elwafa",
+    authorRole: "Edukasi & Tokoh Azhary",
+    date: "16/12/2024",
+    image: "/assets/articles/WhatsApp-Image-2025-08-08-at-10.51.21.jpeg",
+    status: 'PUBLISHED',
+    readTime: "5 menit baca"
+  },
+  {
+    id: "art-afwaja-10",
+    slug: "rihlah-santri-elwafa-ke-alexandria-mesir",
+    title: "Rihlah Ilmiah Santri Elwafa ke Alexandria: Mengunjungi Makam Ulama & Perpustakaan Bersejarah",
+    category: "KEGIATAN",
+    summary: "Dokumentasi kegiatan santri Elwafa di Kairo saat mengadakan lawatan edukasi ke kota pesisir Alexandria, mengunjungi makam Imam Al-Bushiri dan Perpustakaan Bibliotheca Alexandrina.",
+    content: `Selain menuntut ilmu di bangku kuliah, santri Elwafa Center di Mesir secara rutin diajak mengikuti rihlah ilmiah ke berbagai situs bersejarah Islam.
+
+Salah satu destinasi favorit adalah kota Alexandria di pesisir Laut Mediterania. Para santri berziarah ke makam Imam Al-Bushiri pengarang Qashidah Burdah, makam Abu Al-Abbas Al-Mursi, serta mengeksplorasi khazanah literatur di Bibliotheca Alexandrina yang megah.`,
+    author: "Wali Asrama Kairo",
+    authorRole: "Pendampingan Lapangan Mesir",
+    date: "22/01/2024",
+    image: "/assets/gallery/1.jpeg",
+    status: 'PUBLISHED',
+    readTime: "3 menit baca"
+  },
+  {
+    id: "art-afwaja-11",
+    slug: "turnamen-olahraga-santri-pererat-ukhuwah",
+    title: "Elwafa Futsal & Sports Championship: Ajang Olahraga dan Silaturahmi Santri Calon Azhary",
+    category: "KEGIATAN",
+    summary: "Menjaga kebugaran jasmani di sela-sela padatnya daurah kitab dan hafalan Al-Qur'an melalui turnamen persahabatan antar asrama.",
+    content: `Di dalam tubuh yang sehat terdapat jiwa yang kuat ('Al-Aqlus Salim fil Jismis Salim'). Prinsip ini dipegang teguh dalam pembinaan santri Elwafa Center. 
+
+Di samping jadwal halaqah turats dan hafalan Qur'an, santri rutin berolahraga bersama untuk memupuk kekompakan, sportivitas, dan ukhuwah islamiyyah yang erat sebelum mereka bersama-sama mengarungi perantauan di negeri para nabi.`,
+    author: "Divisi Kepemudaan Elwafa",
+    authorRole: "Aktivitas & Ekstrakurikuler",
+    date: "23/01/2024",
+    image: "/assets/articles/WhatsApp-Image-2023-09-01-at-10.55.01-300x200.jpeg",
+    status: 'PUBLISHED',
+    readTime: "2 menit baca"
+  },
+  {
+    id: "art-afwaja-12",
+    slug: "biografi-grand-syeikh-al-azhar-ahmed-al-tayeb",
+    title: "Calon Pelajar Al-Azhar Mesir Harus Tahu! Biografi Grand Syeikh Al-Azhar Prof. Dr. Ahmed Al-Tayeb",
+    category: "SEPUTAR AL-AZHAR",
+    summary: "Mengenal keteladanan, kedalaman ilmu filsafat Islam, dan diplomasi perdamaian Grand Syeikh Al-Azhar yang sangat mencintai umat Islam Indonesia.",
+    content: `Prof. Dr. Ahmed Al-Tayeb adalah Grand Syeikh Al-Azhar ke-48 yang dikenal luas atas komitmennya merajut persaudaraan kemanusiaan global dan membela prinsip wasathiyyah Islam.
+
+Beliau beberapa kali berkunjung ke Indonesia dan selalu menyampaikan kekaguman atas keharmonisan kehidupan umat beragama di nusantara. Memahami biografi dan pemikiran beliau menjadi bekal moral yang berharga bagi setiap calon mahasiswa yang hendak belajar di bawah naungan Al-Azhar.`,
+    author: "Ustadz Ihsan Efendi, Lc",
+    authorRole: "Pengasuh Elwafa Center",
+    date: "15/07/2025",
+    image: "/assets/9.jpeg",
+    status: 'PUBLISHED',
+    readTime: "5 menit baca"
+  },
 ];
 
 export const INITIAL_STUDENTS: Student[] = [
@@ -233,7 +374,7 @@ export const INITIAL_STUDENTS: Student[] = [
       { id: 'doc-4', name: 'Pas Foto 4x6 Latar Putih', type: 'PNG', status: 'uploaded', fileName: 'PasFoto_Faris.png', uploadDate: '2026-10-18' }
     ],
     biodataCompleted: true,
-    avatar: '/assets/Model-1.png'
+    avatar: '/assets/avatar-fauzan.png'
   },
   {
     id: 'EWF-2026-002',
@@ -345,26 +486,26 @@ export const INITIAL_STUDENTS: Student[] = [
 export const INITIAL_ACTIVITIES: Activity[] = [
   {
     id: 'act-1',
-    title: 'Karantina Intensif Bahasa Arab & Tahfidz Al-Azhar',
+    title: 'Pembinaan & Pendampingan Santri di Kairo',
     date: '12 Oktober 2026',
-    image: '/assets/karantina_ciamis.png',
-    description: 'Pelepasan santri program pembinaan intensif 3 bulan persiapan tes seleksi masuk Universitas Al-Azhar di Ciamis.',
-    category: 'Karantina'
+    image: '/assets/before footer.jpeg',
+    description: 'Pelepasan dan pendampingan santri bimbingan Elwafa Center di Markaz Tathwir Al-Azhar Kairo.',
+    category: 'Pendampingan'
   },
   {
     id: 'act-2',
-    title: 'Dauroh Sukses Tembus Al-Azhar Kairo Bersama Alumni',
+    title: 'Rihlah Edukatif & Ziarah Ilmiah Alexandria',
     date: '28 September 2026',
-    image: '/assets/dauroh_success.png',
-    description: 'Seminar motivasi & strategi menjawab soal muqabalah serta tes tulis Al-Azhar bersama Masyaikh Kairo.',
-    category: 'Seminar'
+    image: '/assets/background.jpeg',
+    description: 'Kunjungan edukatif santri bimbingan Elwafa ke Bibliotheca Alexandrina dan situs bersejarah Mesir.',
+    category: 'Rihlah'
   },
   {
     id: 'act-3',
-    title: 'Tryout Akbar Nasional Calon Mahasiswa Baru Al-Azhar',
+    title: 'Tryout Akbar CBT Nasional Masuk Al-Azhar',
     date: '15 September 2026',
-    image: '/assets/tryout_camaba.png',
-    description: 'Simulasi ujian serentak nasional berbasis CBT menguji materi Lughoh Arabiyyah, Balaghah, dan Syariah.',
+    image: '/assets/articles/DSC03995-scaled.jpg',
+    description: 'Simulasi ujian serentak berbasis komputer (CBT) menguji materi Lughoh Arabiyyah, Balaghah, dan Syariah.',
     category: 'Tryout'
   }
 ];
@@ -393,5 +534,63 @@ export const INITIAL_ANNOUNCEMENTS: Announcement[] = [
     category: 'Administrasi',
     important: false,
     content: 'Pendaftaran asrama karantina bahasa Arab dibuka sampai kuota 40 peserta terpenuhi. Konfirmasi kedatangan melalui nomor helpdesk Elwafa.'
+  }
+];
+
+export const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
+  {
+    id: 'cal-1',
+    title: 'Seleksi Nasional Tahfidz & Bahasa Kemenag (Diktis)',
+    date: '2026-10-22',
+    time: '08:00 - 15:00 WIB',
+    location: 'Ruang Ujian CBT Elwafa & Kampus UIN',
+    category: 'SELEKSI',
+    description: 'Ujian Computer-Based Test (CBT) serentak bagi calon mahasiswa S1 Al-Azhar jalur Kemenag.',
+    quotaTarget: 120,
+    status: 'ONGOING'
+  },
+  {
+    id: 'cal-2',
+    title: 'Try Out Akbar Hadatsah Mu\'adalah Kairo',
+    date: '2026-10-25',
+    time: '09:00 - 12:00 WIB',
+    location: 'Aula Utama & Daring Zoom',
+    category: 'TRYOUT',
+    description: 'Simulasi materi qiraah, nahwu, balaghah, dan adab muqarrar Al-Azhar tingkat Tsanawi.',
+    quotaTarget: 80,
+    status: 'UPCOMING'
+  },
+  {
+    id: 'cal-3',
+    title: 'Penutupan Registrasi Berkas Apostille Kemenkumham',
+    date: '2026-10-28',
+    time: '17:00 WIB',
+    location: 'Sekretariat Elwafa Bogor',
+    category: 'ADMINISTRASI',
+    description: 'Batas akhir penerimaan berkas ijazah, transkrip nilai, dan terjemahan resmi tersumpah.',
+    quotaTarget: 40,
+    status: 'UPCOMING'
+  },
+  {
+    id: 'cal-4',
+    title: 'Gladi Resik & Pembekalan Manasik Studi Kairo',
+    date: '2026-11-05',
+    time: '08:30 - 16:00 WIB',
+    location: 'Asrama Karantina Ciamis',
+    category: 'DAUROH',
+    description: 'Orientasi keilmuan talaqqi, tata tertib asrama Kairo, dan adaptasi musim dingin Mesir.',
+    quotaTarget: 60,
+    status: 'UPCOMING'
+  },
+  {
+    id: 'cal-5',
+    title: 'Pelepasan Kloter 1 Penerbangan CGK -> CAI (Cairo)',
+    date: '2026-11-15',
+    time: '19:30 WIB',
+    location: 'Bandara Internasional Soekarno-Hatta (T3)',
+    category: 'KEBERANGKATAN',
+    description: 'Keberangkatan rombongan santri bersama pendamping ustadz menuju Kairo International Airport.',
+    quotaTarget: 35,
+    status: 'UPCOMING'
   }
 ];

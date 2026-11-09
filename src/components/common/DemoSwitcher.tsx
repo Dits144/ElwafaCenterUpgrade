@@ -4,8 +4,8 @@ import { Role } from '../../types';
 import { Users, GraduationCap, ShieldCheck, RotateCcw, ChevronDown, ChevronUp, Sparkles, Check, HelpCircle } from 'lucide-react';
 
 export const DemoSwitcher: React.FC = () => {
-  const { role, setRole, activeStudentId, setActiveStudentId, activeStudent, students, resetDemoData, showToast } = useApp();
-  const [isOpen, setIsOpen] = useState(true);
+  const { role, setRole, currentPage, setCurrentPage, activeStudentId, setActiveStudentId, activeStudent, students, resetDemoData, showToast } = useApp();
+  const [isOpen, setIsOpen] = useState(false);
   const [showScenarioModal, setShowScenarioModal] = useState(false);
 
   const handleRoleChange = (newRole: Role) => {
@@ -20,10 +20,10 @@ export const DemoSwitcher: React.FC = () => {
 
   return (
     <>
-      {/* Floating Demo Control Pill */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-3xl">
+      {/* Demo navigation stays in the document flow so it never covers form actions. */}
+      <div className="relative z-40 w-full max-w-3xl mx-auto p-2">
         <div className="bg-elwafa-ocean-dark/95 backdrop-blur-md border border-white/15 text-white rounded-2xl shadow-elevated p-2.5 transition-all duration-300">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-center sm:justify-between gap-2">
             {/* Left badge */}
             <div className="flex items-center gap-2 pl-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -33,7 +33,7 @@ export const DemoSwitcher: React.FC = () => {
             </div>
 
             {/* Role switch buttons */}
-            <div className="flex items-center bg-white/10 p-1 rounded-xl gap-1">
+            <div className="flex flex-wrap items-center bg-white/10 p-1 rounded-xl gap-1 max-w-full">
               <button
                 onClick={() => handleRoleChange('visitor')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
@@ -68,6 +68,20 @@ export const DemoSwitcher: React.FC = () => {
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Admin</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setRole('visitor');
+                  setCurrentPage('login');
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  role === 'visitor' && currentPage === 'login'
+                    ? 'bg-white text-elwafa-ocean font-bold shadow-sm'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span>Halaman Login Demo</span>
               </button>
             </div>
 

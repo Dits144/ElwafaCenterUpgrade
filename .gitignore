@@ -5,3 +5,6 @@ dist
 .DS_Store
 Thumbs.db
 tools/
+server/data/
+server/*.sqlite
+server/*.sqlite-*

@@ -1,0 +1,20 @@
+const {chromium}=require('playwright');
+(async()=>{
+ const browser=await chromium.launch({headless:true}); const page=await browser.newPage({viewport:{width:390,height:844}}); const errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:5198/',{waitUntil:'networkidle'});
+ console.log('LANDING',await page.title(),await page.locator('h1').first().innerText());
+ console.log('SECTIONS',await page.locator('main section').count(),'BROKEN_IMAGES',await page.locator('img').evaluateAll(xs=>xs.filter(x=>!x.complete||!x.naturalWidth).map(x=>x.src)));
+ console.log('OVERFLOW',await page.evaluate(()=>[document.documentElement.scrollWidth,innerWidth]));
+ await page.getByRole('button',{name:'Detail Program'}).first().click(); console.log('DETAIL',await page.getByRole('button',{name:/Daftar Program Ini Sekarang/}).isVisible());
+ await page.getByRole('button',{name:/Daftar Program Ini Sekarang/}).click(); console.log('REGISTER',await page.getByRole('heading',{name:/Mulai Langkah Studi/}).isVisible());
+ await page.locator('input[type=text]').last().count();
+ await page.getByPlaceholder('Contoh: Muhammad Farhan Al-Ghifari').fill('Santri Uji Demo');
+ await page.getByPlaceholder('santri@gmail.com').fill('demo@example.test');
+ await page.getByPlaceholder('08123456789').fill('080000000000');
+ await page.getByRole('button',{name:/Lanjut ke Portal Mahasiswa/}).click();
+ console.log('STUDENT',await page.locator('body').innerText().then(x=>x.slice(0,420)));
+ await page.reload({waitUntil:'networkidle'}); console.log('RELOAD_STUDENT',await page.locator('body').innerText().then(x=>x.includes('Santri Uji Demo')));
+ console.log('ERRORS',errors);
+ await browser.close();
+})().catch(e=>{console.error(e);process.exitCode=1});

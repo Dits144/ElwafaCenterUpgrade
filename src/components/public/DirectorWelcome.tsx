@@ -1,5 +1,5 @@
 import React from 'react';
-import { Quote, CheckCircle, GraduationCap } from 'lucide-react';
+import { CheckCircle, GraduationCap } from 'lucide-react';
 
 export const DirectorWelcome: React.FC = () => {
   return (
@@ -11,28 +11,20 @@ export const DirectorWelcome: React.FC = () => {
           {/* Foto Pimpinan / Pengasuh Lembaga */}
           <div className="lg:col-span-5 relative flex justify-center">
             <div className="relative w-full max-w-sm">
-              <div className="absolute inset-0 bg-gradient-to-tr from-elwafa-teal/20 to-elwafa-gold/20 rounded-3xl transform -rotate-2 scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-elwafa-teal/20 to-elwafa-gold/20 rounded-3xl" />
               
               <div className="relative bg-white rounded-3xl p-3 shadow-elevated border border-elwafa-surface-border overflow-hidden">
                 <img
-                  src="/assets/Model-1.png"
-                  alt="Drs. KH. Ahmad Muzammil, M.Pd.I - Pengasuh Elwafa Center"
-                  className="w-full h-auto object-cover rounded-2xl"
+                  src="/assets/founder-elwafa.png"
+                  alt="Ust. Ihsan Efendi Lc - Founder & Direktur Elwafa Center"
+                  className="w-full h-auto object-cover rounded-2xl max-h-[400px]"
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/assets/Hero-Image-3.2-768x768.png';
+                    (e.currentTarget as HTMLImageElement).src = '/assets/background.jpeg';
                   }}
                 />
-                
                 <div className="absolute bottom-5 left-5 right-5 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-elwafa-surface-border text-center">
-                  <h4 className="text-sm font-extrabold text-elwafa-ocean">
-                    Drs. KH. Ahmad Muzammil, M.Pd.I
-                  </h4>
-                  <p className="text-xs text-elwafa-teal font-semibold">
-                    Pengasuh &amp; Direktur Elwafa Center
-                  </p>
-                  <p className="text-[10px] text-elwafa-text-muted mt-0.5">
-                    Alumni Universitas Al-Azhar Kairo Mesir
-                  </p>
+                  <h4 className="text-sm font-extrabold text-elwafa-ocean">Visi Pembinaan Elwafa Center</h4>
+                  <p className="text-xs text-elwafa-teal font-semibold">Bimbingan Terpadu Menuju Al-Azhar Kairo</p>
                 </div>
               </div>
             </div>
@@ -50,10 +42,9 @@ export const DirectorWelcome: React.FC = () => {
               Melahirkan Kader Ulama &amp; Cendekiawan Muslim Berwawasan Wasathiyyah
             </h2>
 
-            <div className="relative pl-6 border-l-2 border-elwafa-gold italic text-xs sm:text-sm text-elwafa-text-main leading-relaxed">
-              <Quote className="w-6 h-6 text-elwafa-gold/40 absolute -top-2 left-0 -translate-x-full" />
-              "Bismillahirrahmanirrahim. Lembaga Elwafa Center hadir sebagai jembatan ilmu dan wasilah bagi para pelajar dari seluruh pelosok tanah air yang bercita-cita menuntut ilmu agama di negeri para nabi, Universitas Al-Azhar Kairo Mesir. Kami membina dengan hati, mendampingi dengan amanah, serta menanamkan adab dan kemandirian sejak di asrama karantina hingga mereka menginjakkan kaki di bumi Kinanah."
-            </div>
+            <div className="relative pl-6 border-l-2 border-elwafa-gold text-xs sm:text-sm text-elwafa-text-main leading-relaxed italic">
+              "Menuntut ilmu ke Universitas Al-Azhar Mesir bukan sekadar perjalanan akademik biasa, melainkan pengembaraan spiritual dan amanah peradaban umat Islam. Elwafa Center hadir mendampingi santri dari tanah air hingga menjejakkan kaki di serambi ilmu Kairo."
+            </div> 
 
             <p className="text-xs sm:text-sm text-elwafa-text-muted leading-relaxed">
               Elwafa Center menerapkan sistem pembinaan terpadu di mana santri dibimbing menguasai bahasa Arab fusha (nahwu, sharaf, balaghah), memperkuat hafalan Al-Qur'an mutqin bersanad, serta menelaah kitab-kitab turats rujukan Al-Azhar. Pendampingan kami menyeluruh dari proses legalisir Kemenag/Kemlu, visa pelajar KBRI, hingga penjemputan dan asrama di Kairo.

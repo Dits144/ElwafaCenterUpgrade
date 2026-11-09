@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
 import { Program } from '../../types';
 import { ArrowRight, CheckCircle2, Clock, Calendar, Info, BookCheck } from 'lucide-react';
@@ -9,18 +10,21 @@ interface ProgramsSectionProps {
 
 export const ProgramsSection: React.FC<ProgramsSectionProps> = ({ onSelectProgram }) => {
   const { programs, setSelectedProgramForDetail } = useApp();
+  const reducedMotion = useReducedMotion();
+  const safePercentage = (enrolled: number, quota: number) => quota > 0 ? Math.min(100, Math.max(0, Math.round(enrolled / quota * 100))) : 0;
 
   return (
-    <section id="program" className="py-20 bg-white border-b border-elwafa-surface-border">
+    <section id="program" className="py-20 bg-[#F8F6F0] border-b border-[#EAE3D5]"> 
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-elwafa-teal/10 text-elwafa-teal text-xs font-bold uppercase tracking-wider mb-3">
             <BookCheck className="w-3.5 h-3.5" />
-            <span>Pilihan Program Resmi</span>
+            <span>Jelajahi Program</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-elwafa-ocean tracking-tight">
+          <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#123C35] tracking-tight">
             Program Studi &amp; Pembinaan Elwafa Center
           </h2>
           <p className="mt-3 text-sm sm:text-base text-elwafa-text-muted leading-relaxed">
@@ -31,21 +35,29 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({ onSelectProgra
         {/* 3 Authentic Service Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {programs.map((prog) => {
-            const percentage = Math.round((prog.enrolledCount / prog.quota) * 100);
+            const percentage = safePercentage(prog.enrolledCount, prog.quota);
 
             return (
-              <div
+              <motion.div
                 key={prog.id}
-                className="group flex flex-col bg-elwafa-surface rounded-3xl border border-elwafa-surface-border overflow-hidden hover:shadow-elevated transition-all duration-300"
+                initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.08 }}
+                transition={{ duration: reducedMotion ? 0 : 0.46, delay: reducedMotion ? 0 : Math.min(0.16, programs.indexOf(prog) * 0.08), ease: 'easeOut' }}
+                className="group flex flex-col bg-white rounded-2xl border border-[#EAE3D5] overflow-hidden hover:border-[#C6A76A] hover:shadow-elevated transition-[box-shadow,border-color] duration-300"
               >
                 {/* Header Image */}
                 <div className="relative h-52 bg-elwafa-ocean overflow-hidden">
                   <img
-                    src={prog.image}
+                    src={prog.image || '/assets/8.jpeg'}
                     alt={prog.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                    loading="eager"
+                    decoding="async"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 motion-reduce:transition-none opacity-95"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/assets/background.jpeg';
+                      const image = e.currentTarget;
+                      image.onerror = null;
+                      image.src = '/assets/8.jpeg';
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-elwafa-ocean-dark via-transparent to-black/20" />
@@ -131,7 +143,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({ onSelectProgra
                   </div>
                 </div>
 
-              </div>
+              </motion.div>
             );
           })}
         </div>

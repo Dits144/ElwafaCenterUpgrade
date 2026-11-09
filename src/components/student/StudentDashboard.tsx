@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
 import { ApplicationStatus } from '../../types';
 import { 
@@ -22,8 +23,21 @@ import {
 
 export const StudentDashboard: React.FC = () => {
   const { activeStudent, updateBiodata, applyProgram, programs, announcements, setRole, showToast } = useApp();
+  const reducedMotion = useReducedMotion();
   
-  const [activeTab, setActiveTab] = useState<'overview' | 'biodata' | 'programs' | 'documents' | 'announcements'>('overview');
+  type StudentTab = 'overview' | 'biodata' | 'programs' | 'documents' | 'announcements';
+  const [activeTab, setActiveTab] = useState<StudentTab>('overview');
+  const studentTabs: { id: StudentTab; label: string; icon: React.ReactNode }[] = [
+    { id: 'overview', label: 'Ringkasan & Tracker', icon: <User className="w-4 h-4" /> },
+    { id: 'biodata', label: 'Biodata Santri', icon: <FileText className="w-4 h-4" /> },
+    { id: 'programs', label: 'Program Peminatan', icon: <BookOpen className="w-4 h-4" /> },
+    { id: 'documents', label: 'Dokumen Berkas', icon: <Upload className="w-4 h-4" /> },
+    { id: 'announcements', label: 'Pengumuman Resmi', icon: <Bell className="w-4 h-4" /> },
+  ];
+  const navigateTab = (tab: StudentTab) => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
 
   // Biodata Form State
   const [formData, setFormData] = useState({
@@ -65,6 +79,12 @@ export const StudentDashboard: React.FC = () => {
 
   const handleSaveBiodata = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.name.trim() || !formData.birthPlace.trim() || !formData.birthDate ||
+        !formData.originCity.trim() || !formData.schoolOrigin.trim() ||
+        !formData.parentName.trim() || !formData.parentPhone.trim()) {
+      showToast('Lengkapi biodata wajib sebelum mengajukan verifikasi.', 'warning');
+      return;
+    }
     updateBiodata(activeStudent.id, formData);
     setActiveTab('overview');
   };
@@ -103,11 +123,13 @@ export const StudentDashboard: React.FC = () => {
   };
 
   const currentStatus = statusConfig[activeStudent.status] || statusConfig.PENDING;
+  const biodataFields = [activeStudent.name, activeStudent.whatsapp, activeStudent.birthPlace, activeStudent.birthDate, activeStudent.originCity, activeStudent.address, activeStudent.schoolOrigin, activeStudent.parentName, activeStudent.parentPhone];
+  const biodataProgress = Math.round(biodataFields.filter(value => String(value ?? '').trim().length > 0).length / biodataFields.length * 100);
 
   return (
-    <div className="min-h-screen bg-elwafa-surface pb-28">
+    <div className="min-h-screen bg-[#F8F6F0] pb-24">
       {/* Top Portal Header */}
-      <div className="bg-elwafa-ocean-dark text-white border-b border-white/10">
+      <div className="bg-[#123C35] text-white border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
@@ -147,20 +169,16 @@ export const StudentDashboard: React.FC = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto gap-2 border-t border-white/10 pt-2 pb-0">
-          {[
-            { id: 'overview', label: 'Ringkasan & Tracker', icon: <User className="w-4 h-4" /> },
-            { id: 'biodata', label: 'Biodata Santri', icon: <FileText className="w-4 h-4" /> },
-            { id: 'programs', label: 'Program Peminatan', icon: <BookOpen className="w-4 h-4" /> },
-            { id: 'documents', label: 'Dokumen Berkas', icon: <Upload className="w-4 h-4" /> },
-            { id: 'announcements', label: 'Pengumuman Resmi', icon: <Bell className="w-4 h-4" /> },
-          ].map((tab) => (
+        <nav aria-label="Menu mahasiswa" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto gap-2 border-t border-white/10 pt-2 pb-0">
+          {studentTabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all ${
+              type="button"
+              aria-current={activeTab === tab.id ? 'page' : undefined}
+              onClick={() => navigateTab(tab.id)}
+              className={`flex min-h-11 items-center gap-2 px-4 py-3 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-[background-color,color,border-color] ${
                 activeTab === tab.id
-                  ? 'border-elwafa-teal text-elwafa-teal-light bg-white/5'
+                  ? 'border-[#C6A76A] text-white bg-white/10'
                   : 'border-transparent text-white/70 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -168,11 +186,60 @@ export const StudentDashboard: React.FC = () => {
               <span>{tab.label}</span>
             </button>
           ))}
-        </div>
+        </nav>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Student Portal Container with Sidebar & Content Workspace */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* STUDENT SIDEBAR (3 COLS) */}
+          <aside className="hidden lg:block lg:col-span-3 bg-white rounded-2xl p-5 border border-[#EAE3D5] shadow-soft sticky top-24 space-y-6">
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-elwafa-teal block mb-1">
+                Portal Mandiri
+              </span>
+              <h3 className="text-sm font-black text-elwafa-ocean">Akun Calon Santri</h3>
+            </div>
+
+            <nav aria-label="Menu mahasiswa desktop" className="space-y-1.5">
+              {studentTabs.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-current={activeTab === item.id ? 'page' : undefined}
+                  onClick={() => navigateTab(item.id)}
+                  className={`w-full min-h-11 flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                    activeTab === item.id
+                      ? 'bg-[#123C35] text-white shadow-xs'
+                      : 'text-elwafa-text-main hover:bg-elwafa-surface hover:text-elwafa-ocean'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </div>
+                  <ChevronRight className={`w-3.5 h-3.5 transition-transform ${activeTab === item.id ? 'text-elwafa-gold rotate-90' : 'text-elwafa-text-muted'}`} />
+                </button>
+              ))}
+            </nav>
+
+            <div className="pt-4 border-t border-elwafa-surface-border">
+              <div className="p-3 bg-elwafa-surface rounded-2xl border border-elwafa-surface-border text-xs">
+                <span className="text-[10px] text-elwafa-text-muted block">Status Pendaftaran</span>
+                <span className="font-extrabold text-elwafa-teal mt-0.5 block">{currentStatus.label}</span>
+                <button
+                  onClick={() => setRole('visitor')}
+                  className="mt-2 text-[10px] font-bold text-elwafa-ocean hover:text-elwafa-teal flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Lihat Web Publik →</span>
+                </button>
+              </div>
+            </div>
+          </aside>
+
+          {/* STUDENT MAIN CONTENT (9 COLS) */}
+          <motion.main key={activeTab} initial={reducedMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reducedMotion ? 0 : 0.24, ease: 'easeOut' }} className="min-w-0 lg:col-span-9 space-y-8">
 
         {/* Status Alert Banner */}
         <div className={`rounded-2xl p-5 mb-8 border shadow-soft ${currentStatus.bg}`}>
@@ -200,13 +267,7 @@ export const StudentDashboard: React.FC = () => {
             )}
 
             {activeStudent.status === 'APPROVED' && (
-              <button
-                onClick={() => showToast('Mengunduh Surat Tanda Penerimaan & Jadwal Karantina PDF...', 'success')}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all shrink-0"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Unduh Bukti Kelulusan</span>
-              </button>
+              <span className="text-xs font-medium text-emerald-800">Status persetujuan demo tersimpan. Dokumen resmi tidak tersedia.</span>
             )}
           </div>
 
@@ -228,7 +289,7 @@ export const StudentDashboard: React.FC = () => {
                 <span className="text-xs font-semibold text-elwafa-text-muted">Kelengkapan Biodata</span>
                 <div className="mt-2 flex items-center justify-between">
                   <span className="text-2xl font-bold text-elwafa-ocean">
-                    {activeStudent.biodataCompleted ? '100%' : '65%'}
+                    {biodataProgress}%
                   </span>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${activeStudent.biodataCompleted ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
                     {activeStudent.biodataCompleted ? 'Lengkap' : 'Belum Lengkap'}
@@ -251,8 +312,8 @@ export const StudentDashboard: React.FC = () => {
               <div className="bg-white p-5 rounded-2xl border border-elwafa-surface-border shadow-soft">
                 <span className="text-xs font-semibold text-elwafa-text-muted">Jadwal Simulasi Tes</span>
                 <div className="mt-2">
-                  <span className="text-base font-bold text-elwafa-ocean block">24 Oktober 2026</span>
-                  <span className="text-[11px] text-elwafa-teal">Gladi Resik Muqabalah</span>
+                  <span className="text-base font-bold text-elwafa-ocean block">Lihat agenda</span>
+                  <span className="text-[11px] text-elwafa-teal">Konfirmasi jadwal kepada tim</span>
                 </div>
               </div>
 
@@ -751,14 +812,14 @@ export const StudentDashboard: React.FC = () => {
                     <div className="pt-6 mt-4 border-t border-elwafa-surface-border">
                       <button
                         onClick={() => applyProgram(activeStudent.id, prog.id)}
-                        disabled={isSelected}
+                        disabled={isSelected || !['DRAFT', 'REVISION_REQUIRED'].includes(activeStudent.status)}
                         className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all ${
-                          isSelected
+                          isSelected || !['DRAFT', 'REVISION_REQUIRED'].includes(activeStudent.status)
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
                             : 'bg-elwafa-ocean hover:bg-elwafa-teal text-white shadow-sm'
                         }`}
                       >
-                        {isSelected ? '✓ Sedang Dijalani' : 'Pilih & Ajukan Program Ini'}
+                        {isSelected ? '✓ Program Pilihan' : !['DRAFT', 'REVISION_REQUIRED'].includes(activeStudent.status) ? 'Pilihan terkunci selama verifikasi' : 'Pilih Program Ini'}
                       </button>
                     </div>
                   </div>
@@ -774,15 +835,9 @@ export const StudentDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-elwafa-ocean">Checklist Dokumen Pendaftaran</h3>
-                <p className="text-xs text-elwafa-text-muted">Unggah berkas resmi dalam format PDF atau foto berkualitas tinggi.</p>
+                <p className="text-xs text-elwafa-text-muted">Berkas di sini adalah contoh tampilan. Jangan unggah dokumen asli pada demo lokal.</p>
               </div>
-              <button
-                onClick={() => showToast('Simulasi unggah berkas baru: Dokumen berhasil ditambahkan.', 'success')}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-elwafa-teal hover:bg-elwafa-teal-dark text-white text-xs font-bold shadow-sm"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                <span>Upload Dokumen Baru</span>
-              </button>
+              <span className="text-xs text-elwafa-text-muted">Unggah file belum tersedia pada demo lokal.</span>
             </div>
 
             <div className="divide-y divide-elwafa-surface-border border border-elwafa-surface-border rounded-xl overflow-hidden">
@@ -845,6 +900,8 @@ export const StudentDashboard: React.FC = () => {
           </div>
         )}
 
+          </motion.main>
+        </div>
       </div>
     </div>
   );

@@ -4,30 +4,30 @@ import { Quote, Star } from 'lucide-react';
 export const TestimonialsSection: React.FC = () => {
   const testimonials = [
     {
-      name: 'H. Ahmad Rifai',
-      role: 'Wali Santriwati Ratu Sekar Wangi',
-      affiliation: 'Detasemen Khusus 88 Anti Teror Mabes Polri',
-      image: '/assets/Model-1.png',
+      name: 'Yasmin',
+      role: 'Santriwati Bimbingan Khusus Al-Azhar',
+      affiliation: 'Peserta Dauroh & Pembiasaan Bahasa Arab',
+      image: '/assets/yasmin_santriwati.png',
       quote:
-        'Alhamdulillah dengan bimbingan dan arahan intensif dari tim Elwafa Center, putri kami dapat mempersiapkan studi ke Al-Azhar Mesir dengan sangat lancar, tertib administrasinya, dan penuh bimbingan akhlak.',
+        'Selama saya berada di Elwafa Center, banyak perubahan baik yang saya rasakan, terutama dalam kedisiplinan, kemandirian, dan semangat belajar. Bimbingan dari para musyrif dan pengajar sangat membantu kami memahami pelajaran dengan mudah dan pembiasaan Bahasa Arab setiap hari.',
       rating: 5,
     },
     {
-      name: 'Taqiyya Shafarani',
-      role: 'Santriwati Bimbingan Khusus Al-Azhar',
-      affiliation: 'Peserta Karantina Bahasa & Tahfidz',
-      image: '/assets/taqiyya_shafarani.png',
+      name: 'Ana Sartika',
+      role: 'Santriwati Tahfidz & Bahasa Arab',
+      affiliation: 'Peserta Karantina & Persiapan Kairo',
+      image: '/assets/ana_sartika.png',
       quote:
-        'Karantina bahasa Arab dan tahfidz di Elwafa benar-benar membentuk biah lughawiyyah 24 jam. Saya jadi percaya diri bicara fusha dan siap menghadapi ujian muqabalah maupun lisan di Mesir.',
+        'Bergabung di Elwafa Center merupakan pengalaman yang sangat berharga bagi saya. Di sini saya tidak hanya belajar menghafal Al-Qur\'an dan memperdalam Bahasa Arab, tetapi juga belajar tentang tanggung jawab dan kebersamaan. Para musyrifah selalu membimbing dengan penuh perhatian.',
       rating: 5,
     },
     {
       name: 'Fauzan Ramadhan',
       role: 'Alumni Elwafa Center',
       affiliation: 'Mahasiswa Fakultas Ushuluddin Univ. Al-Azhar Kairo',
-      image: '/assets/Hero-Image-3.2-768x768.png',
+      image: '/assets/avatar-fauzan.png',
       quote:
-        'Materi persiapan seleksi Diktis Kemenag dan Pusiba yang diajarkan ustadz-ustadz alumni Kairo sangat tepat sasaran. Pendampingan berkas hingga asrama di Kairo benar-benar amanah.',
+        'Materi persiapan seleksi Diktis Kemenag dan Pusiba yang diajarkan ustadz-ustadz alumni Kairo sangat tepat sasaran. Pendampingan berkas hingga penempatan asrama di Kairo benar-benar amanah dan profesional.',
       rating: 5,
     },
   ];

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Role, Student, Program, Activity, Announcement, Article, ApplicationStatus } from '../types';
-import { INITIAL_STUDENTS, INITIAL_PROGRAMS, INITIAL_ACTIVITIES, INITIAL_ANNOUNCEMENTS, INITIAL_ARTICLES } from '../data/mockData';
+import { Role, PublicPage, Student, Program, Activity, Announcement, Article, ApplicationStatus, CalendarEvent } from '../types';
+import { INITIAL_STUDENTS, INITIAL_PROGRAMS, INITIAL_ACTIVITIES, INITIAL_ANNOUNCEMENTS, INITIAL_ARTICLES, INITIAL_CALENDAR_EVENTS } from '../data/mockData';
 
 interface ToastState {
   id: number;
@@ -11,6 +11,8 @@ interface ToastState {
 interface AppContextType {
   role: Role;
   setRole: (role: Role) => void;
+  currentPage: PublicPage;
+  setCurrentPage: (page: PublicPage) => void;
   activeStudentId: string;
   setActiveStudentId: (id: string) => void;
   activeStudent: Student;
@@ -19,6 +21,9 @@ interface AppContextType {
   articles: Article[];
   activities: Activity[];
   announcements: Announcement[];
+  calendarEvents: CalendarEvent[];
+  addCalendarEvent: (event: Omit<CalendarEvent, 'id'>) => void;
+  deleteCalendarEvent: (id: string) => void;
   toasts: ToastState[];
   showToast: (message: string, type?: 'success' | 'warning' | 'error' | 'info') => void;
   dismissToast: (id: number) => void;
@@ -63,17 +68,29 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
-  STUDENTS: 'elwafa_students_demo_v2',
-  ROLE: 'elwafa_role_demo_v2',
-  ACTIVE_STUDENT: 'elwafa_active_student_v2',
-  ARTICLES: 'elwafa_articles_demo_v2',
-  PROGRAMS: 'elwafa_programs_demo_v2',
+  STUDENTS: 'elwafa_students_demo_v4',
+  ROLE: 'elwafa_role_demo_v3',
+  ACTIVE_STUDENT: 'elwafa_active_student_v3',
+  ARTICLES: 'elwafa_articles_demo_v6',
+  PROGRAMS: 'elwafa_programs_demo_v6',
+  CALENDAR: 'elwafa_calendar_demo_v4',
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRoleState] = useState<Role>(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash.replace('#', '').toLowerCase() : '';
+    if (hash === 'mahasiswa' || hash === 'student') return 'student';
+    if (hash === 'admin') return 'admin';
     const saved = localStorage.getItem(STORAGE_KEYS.ROLE);
     return (saved as Role) || 'visitor';
+  });
+
+  const [currentPage, setCurrentPageState] = useState<PublicPage>(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash.replace('#', '').toLowerCase() : '';
+    if (['beranda', 'program', 'tentang', 'kegiatan', 'artikel', 'kontak', 'login'].includes(hash)) {
+      return hash as PublicPage;
+    }
+    return 'beranda';
   });
 
   const [activeStudentId, setActiveStudentIdState] = useState<string>(() => {
@@ -117,6 +134,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return INITIAL_PROGRAMS;
   });
 
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.CALENDAR);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse saved calendar', e);
+      }
+    }
+    return INITIAL_CALENDAR_EVENTS;
+  });
+
   const [selectedProgramForDetail, setSelectedProgramForDetail] = useState<Program | null>(null);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [toasts, setToasts] = useState<ToastState[]>([]);
@@ -133,6 +162,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.PROGRAMS, JSON.stringify(programs));
   }, [programs]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.CALENDAR, JSON.stringify(calendarEvents));
+  }, [calendarEvents]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.ROLE, role);
@@ -154,13 +187,53 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
+  const setCurrentPage = (page: PublicPage) => {
+    setCurrentPageState(page);
+    if (role !== 'visitor') {
+      setRoleState('visitor');
+    }
+    if (typeof window !== 'undefined') {
+      window.location.hash = page === 'beranda' ? '' : page;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const raw = window.location.hash.replace('#', '').toLowerCase();
+      if (['beranda', 'program', 'tentang', 'kegiatan', 'artikel', 'kontak', 'login'].includes(raw)) {
+        setCurrentPageState(raw as PublicPage);
+        setRoleState('visitor');
+      } else if (raw === 'mahasiswa' || raw === 'student') {
+        setRoleState('student');
+      } else if (raw === 'admin') {
+        setRoleState('admin');
+      } else if (!raw) {
+        setCurrentPageState('beranda');
+        setRoleState('visitor');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   const setRole = (newRole: Role) => {
     setRoleState(newRole);
     if (newRole === 'visitor') {
+      if (typeof window !== 'undefined') {
+        window.location.hash = currentPage === 'beranda' ? '' : currentPage;
+      }
       showToast('Beralih ke tampilan Pengunjung Publik', 'info');
     } else if (newRole === 'student') {
+      if (typeof window !== 'undefined') {
+        window.location.hash = 'mahasiswa';
+      }
       showToast(`Beralih ke Portal Mahasiswa (${activeStudent?.name || 'Santri'})`, 'info');
     } else if (newRole === 'admin') {
+      if (typeof window !== 'undefined') {
+        window.location.hash = 'admin';
+      }
       showToast('Beralih ke Dashboard Admin & Verifikator', 'info');
     }
   };
@@ -184,7 +257,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...s,
             ...biodata,
             biodataCompleted: true,
-            status: s.status === 'REVISION_REQUIRED' ? 'PENDING' : s.status,
+            status: s.status === 'DRAFT' || s.status === 'REVISION_REQUIRED' ? 'PENDING' : s.status,
           };
         }
         return s;
@@ -197,6 +270,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const applyProgram = (studentId: string, programId: string) => {
     const prog = programs.find((p) => p.id === programId);
     if (!prog) return;
+    if (!['DRAFT', 'REVISION_REQUIRED'].includes(students.find((s) => s.id === studentId)?.status || '')) {
+      showToast('Program hanya dapat diubah saat pendaftaran masih draft atau diminta revisi.', 'warning');
+      return;
+    }
 
     setStudents((prev) =>
       prev.map((s) => {
@@ -205,18 +282,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...s,
             selectedProgramId: prog.id,
             selectedProgramName: prog.title,
-            status: 'PENDING',
+            status: s.biodataCompleted ? 'PENDING' : 'DRAFT',
           };
         }
         return s;
       })
     );
-    showToast(`Pendaftaran program "${prog.title}" berhasil diajukan! Menunggu verifikasi admin.`, 'success');
+    showToast(`Program "${prog.title}" dipilih. ${students.find((s) => s.id === studentId)?.biodataCompleted ? 'Perubahan diajukan untuk verifikasi.' : 'Lengkapi biodata untuk mengajukan verifikasi.'}`, 'info');
   };
 
   // Action: Register New Student
   const registerStudent = (data: { name: string; email: string; whatsapp: string; selectedProgramId: string }): string => {
-    const nextNum = students.length + 1;
+    const nextNum = Math.max(0, ...students.map((s) => Number(s.id.match(/EWF-2026-(\d+)/)?.[1] || 0))) + 1;
     const newId = `EWF-2026-${String(nextNum).padStart(3, '0')}`;
     const prog = programs.find((p) => p.id === data.selectedProgramId) || programs[0];
 
@@ -226,25 +303,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       email: data.email,
       whatsapp: data.whatsapp,
       gender: 'L',
-      birthPlace: 'Jakarta',
-      birthDate: '2007-01-01',
-      originCity: 'Jakarta Selatan, DKI Jakarta',
-      address: 'Jl. Merdeka No. 10',
-      schoolOrigin: 'MAN 4 Jakarta',
+      birthPlace: '',
+      birthDate: '',
+      originCity: '',
+      address: '',
+      schoolOrigin: '',
       schoolType: 'MA',
-      graduationYear: '2025',
-      parentName: 'H. Orang Tua Santri',
-      parentPhone: '081234567890',
-      parentOccupation: 'Pegawai Swasta',
+      graduationYear: '',
+      parentName: '',
+      parentPhone: '',
+      parentOccupation: '',
       selectedProgramId: prog.id,
       selectedProgramName: prog.title,
-      status: 'PENDING',
+      status: 'DRAFT',
       registrationDate: new Date().toISOString().split('T')[0],
-      documents: [
-        { id: 'doc-auto-1', name: 'Scan Ijazah Terlegalisir', type: 'PDF', status: 'uploaded', fileName: `Ijazah_${data.name.replace(/\s+/g, '')}.pdf`, uploadDate: new Date().toISOString().split('T')[0] },
-        { id: 'doc-auto-2', name: 'Pas Foto 4x6', type: 'PNG', status: 'uploaded', fileName: 'PasFoto_Formal.png', uploadDate: new Date().toISOString().split('T')[0] }
-      ],
-      biodataCompleted: true,
+      documents: [],
+      biodataCompleted: false,
     };
 
     setStudents((prev) => [newStudent, ...prev]);
@@ -256,16 +330,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Action: Admin Approve Application
   const adminApproveApplication = (studentId: string, notes?: string) => {
+    if (students.find((s) => s.id === studentId)?.status !== 'PENDING') {
+      showToast('Hanya pendaftaran yang sudah diajukan dapat disetujui.', 'warning');
+      return;
+    }
     const now = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
     setStudents((prev) =>
       prev.map((s) => {
-        if (s.id === studentId) {
+        if (s.id === studentId && s.status === 'PENDING') {
           return {
             ...s,
             status: 'APPROVED' as ApplicationStatus,
             reviewedAt: now,
-            reviewedBy: 'Ustadz Ridwan (Admin Verifikator)',
-            revisionNotes: notes || 'Berkas pendaftaran telah diverifikasi lengkap dan memenuhi kriteria akademik.',
+            reviewedBy: 'Admin Demo',
+            revisionNotes: notes || 'Pendaftaran disetujui dalam simulasi lokal. Ini bukan keputusan resmi Elwafa Center.',
             documents: s.documents.map((d) => ({ ...d, status: 'verified' as const })),
           };
         }
@@ -277,6 +355,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Action: Admin Request Revision
   const adminRequestRevision = (studentId: string, revisionNotes: string) => {
+    if (students.find((s) => s.id === studentId)?.status !== 'PENDING') {
+      showToast('Hanya pendaftaran yang sedang diverifikasi dapat diminta revisi.', 'warning');
+      return;
+    }
     const now = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
     setStudents((prev) =>
       prev.map((s) => {
@@ -285,7 +367,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...s,
             status: 'REVISION_REQUIRED' as ApplicationStatus,
             reviewedAt: now,
-            reviewedBy: 'Ustadz Ridwan (Admin Verifikator)',
+            reviewedBy: 'Admin Demo',
             revisionNotes: revisionNotes || 'Terdapat dokumen atau data yang perlu diperjelas.',
           };
         }
@@ -297,6 +379,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Action: Admin Reject Application
   const adminRejectApplication = (studentId: string, reason: string) => {
+    if (students.find((s) => s.id === studentId)?.status !== 'PENDING') {
+      showToast('Hanya pendaftaran yang sedang diverifikasi dapat ditolak.', 'warning');
+      return;
+    }
     const now = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
     setStudents((prev) =>
       prev.map((s) => {
@@ -305,7 +391,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             ...s,
             status: 'REJECTED' as ApplicationStatus,
             reviewedAt: now,
-            reviewedBy: 'Ustadz Ridwan (Admin Verifikator)',
+            reviewedBy: 'Admin Demo',
             revisionNotes: reason || 'Kualifikasi belum memenuhi persyaratan tahun ajaran ini.',
           };
         }
@@ -365,6 +451,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Program berhasil dihapus.', 'info');
   };
 
+  // Action: Calendar Events
+  const addCalendarEvent = (event: Omit<CalendarEvent, 'id'>) => {
+    const newEv: CalendarEvent = {
+      ...event,
+      id: `cal-${Date.now()}`
+    };
+    setCalendarEvents((prev) => [newEv, ...prev]);
+    showToast('Jadwal agenda baru berhasil ditambahkan!', 'success');
+  };
+
+  const deleteCalendarEvent = (id: string) => {
+    setCalendarEvents((prev) => prev.filter((e) => e.id !== id));
+    showToast('Jadwal agenda berhasil dihapus.', 'info');
+  };
+
   // Action: Reset Demo Data
   const resetDemoData = () => {
     localStorage.removeItem(STORAGE_KEYS.STUDENTS);
@@ -372,9 +473,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.removeItem(STORAGE_KEYS.ACTIVE_STUDENT);
     localStorage.removeItem(STORAGE_KEYS.ARTICLES);
     localStorage.removeItem(STORAGE_KEYS.PROGRAMS);
+    localStorage.removeItem(STORAGE_KEYS.CALENDAR);
     setStudents(INITIAL_STUDENTS);
     setArticles(INITIAL_ARTICLES);
     setPrograms(INITIAL_PROGRAMS);
+    setCalendarEvents(INITIAL_CALENDAR_EVENTS);
     setActiveStudentIdState('EWF-2026-001');
     setRoleState('visitor');
     showToast('Data demo berhasil di-reset ke kondisi awal.', 'info');
@@ -385,6 +488,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         role,
         setRole,
+        currentPage,
+        setCurrentPage,
         activeStudentId,
         setActiveStudentId,
         activeStudent,
@@ -393,6 +498,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         articles,
         activities: INITIAL_ACTIVITIES,
         announcements: INITIAL_ANNOUNCEMENTS,
+        calendarEvents,
+        addCalendarEvent,
+        deleteCalendarEvent,
         toasts,
         showToast,
         dismissToast,

@@ -5,14 +5,14 @@ import { Calendar, Image as ImageIcon } from 'lucide-react';
 export const ActivitiesSection: React.FC = () => {
   const { activities } = useApp();
 
-  // Foto dokumentasi asli dari direktori gallery
+  // Foto dokumentasi asli dari direktori gallery dengan deskripsi akurat
   const galleryPhotos = [
-    { src: '/assets/gallery/1.jpeg', title: 'Halaqah Al-Qur\'an Bersanad' },
-    { src: '/assets/gallery/2.jpeg', title: 'Pembinaan Nahwu & Sharaf' },
-    { src: '/assets/gallery/3.jpeg', title: 'Simulasi Muqabalah Lisan' },
-    { src: '/assets/gallery/4.jpeg', title: 'Karantina Bahasa Arab Fusha' },
-    { src: '/assets/gallery/5.jpeg', title: 'Bimbingan Kitab Turats' },
-    { src: '/assets/gallery/6.jpeg', title: 'Orientasi & Pelepasan Santri' },
+    { src: '/assets/gallery/14.jpeg', title: 'Halaqah Belajar & Diskusi Masisir di Kairo' },
+    { src: '/assets/gallery/5.jpeg', title: 'Ziarah Maqam Masyaikh & Ulama di Kairo' },
+    { src: '/assets/gallery/2.jpeg', title: 'Rihlah Edukatif ke Istana Montaza Alexandria' },
+    { src: '/assets/gallery/10.jpeg', title: 'Tafakkur & Ziarah Auliya Mesir' },
+    { src: '/assets/gallery/6.jpeg', title: 'Ukhuwah Santri di Kompleks Bersejarah Kairo' },
+    { src: '/assets/gallery/1.jpeg', title: 'Kunjungan ke Perpustakaan Alexandria' },
   ];
 
   return (

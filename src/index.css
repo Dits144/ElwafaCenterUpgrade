@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand-emerald: #123c35;
+  --brand-forest: #1e5447;
+  --brand-ivory: #f8f6f0;
+  --brand-sand: #eae3d5;
+  --brand-gold: #c6a76a;
+  --brand-charcoal: #202724;
+  --motion-short: 180ms;
+  --motion-medium: 320ms;
+}
+.font-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+[lang="ar"], [dir="rtl"] { font-family: 'Amiri', serif; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

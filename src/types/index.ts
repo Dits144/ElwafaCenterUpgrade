@@ -1,5 +1,7 @@
 export type Role = 'visitor' | 'student' | 'admin';
 
+export type PublicPage = 'beranda' | 'program' | 'tentang' | 'kegiatan' | 'artikel' | 'kontak' | 'login';
+
 export type ApplicationStatus = 'DRAFT' | 'PENDING' | 'REVISION_REQUIRED' | 'APPROVED' | 'REJECTED';
 
 export interface StudentDocument {
@@ -65,7 +67,7 @@ export interface Article {
   id: string;
   slug: string;
   title: string;
-  category: 'Akademik' | 'Kegiatan' | 'Prestasi' | 'Kerjasama' | 'Pengumuman';
+  category: 'TERKINI' | 'SEPUTAR AL-AZHAR' | 'REKOMENDASI' | 'KEGIATAN' | 'PENDIDIKAN' | 'Akademik' | 'Kegiatan' | 'Prestasi' | 'Kerjasama' | 'Pengumuman';
   summary: string;
   content: string;
   author: string;
@@ -92,6 +94,18 @@ export interface Announcement {
   content: string;
   category: 'Akademik' | 'Administrasi' | 'Keberangkatan' | 'Umum';
   important: boolean;
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  time?: string;
+  location?: string;
+  category: 'SELEKSI' | 'DAUROH' | 'ADMINISTRASI' | 'KEBERANGKATAN' | 'TRYOUT';
+  description: string;
+  quotaTarget?: number;
+  status: 'UPCOMING' | 'ONGOING' | 'COMPLETED';
 }
 
 export interface CurrentUser {

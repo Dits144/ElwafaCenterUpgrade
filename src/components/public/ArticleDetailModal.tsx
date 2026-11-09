@@ -5,6 +5,14 @@ import { X, Calendar, User, Clock, Tag, Share2 } from 'lucide-react';
 export const ArticleDetailModal: React.FC = () => {
   const { selectedArticle, setSelectedArticle, showToast } = useApp();
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedArticle(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setSelectedArticle]);
+
   if (!selectedArticle) return null;
 
   const art = selectedArticle;
@@ -15,7 +23,12 @@ export const ArticleDetailModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-fadeIn"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) setSelectedArticle(null);
+      }}
+    >
       <div className="relative bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-elwafa-surface-border">
         
         {/* Banner Image */}
@@ -32,6 +45,7 @@ export const ArticleDetailModal: React.FC = () => {
           
           <button
             onClick={() => setSelectedArticle(null)}
+            aria-label="Tutup Artikel"
             className="absolute top-4 right-4 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors"
           >
             <X className="w-5 h-5" />
